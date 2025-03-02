@@ -1,0 +1,36 @@
+.auth-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to right, #4b6cb7, #182848);
+}
+
+.card {
+  border-radius: 12px;
+}
+
+h3 {
+  font-weight: bold;
+}
+
+.btn-dark {
+  background-color: #000;
+  border-radius: 8px;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+}
+
+.form-control {
+  border-radius: 8px;
+}
+
+.logo{
+  width: 12rem;
+}
+
+.redirect-text{
+  cursor: pointer;
+}

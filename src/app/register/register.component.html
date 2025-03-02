@@ -1,0 +1,176 @@
+<div class="auth-container">
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <div
+            class="d-flex flex-column justify-content-center align-items-center"
+          >
+            <img src="assets/images/logo.png" class="logo" alt="" />
+            <h3 class="text-center">Sign Up</h3>
+          </div>
+          <form #registerForm="ngForm" class="row">
+            <!-- Role Selection -->
+            <div class="form-group">
+              <label>I am a:</label><br />
+              <label *ngFor="let role of roles">
+                <input
+                  type="radio"
+                  name="role"
+                  [value]="role"
+                  [(ngModel)]="selectedRole"
+                  (change)="onRoleChange()"
+                />
+                {{ role }}
+              </label>
+            </div>
+
+            <!-- User Name -->
+            <div class="form-group col-6">
+              <label for="userName">User Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="userName"
+                name="userName"
+                placeholder="Enter your name"
+                [(ngModel)]="userName"
+                required
+              />
+            </div>
+
+            <!-- Age (Only for Patient) -->
+            <div class="form-group col-6" *ngIf="selectedRole === 'Patient'">
+              <label for="age">Age</label>
+              <input
+                type="number"
+                class="form-control"
+                id="age"
+                name="age"
+                min="1"
+                (input)="validateAge()"
+                [(ngModel)]="age"
+                required
+              />
+            </div>
+
+            <!-- City & Address (For Other Roles) -->
+            <div class="form-group col-6" *ngIf="selectedRole !== 'Patient'">
+              <label for="city">City</label>
+              <app-city-dropdown
+                (citySelected)="handleCitySelection($event)"
+                (click)="onCityBlur()"
+              ></app-city-dropdown>
+              <small *ngIf="cityTouched && city == ''" class="text-danger">
+                City is required.
+              </small>
+            </div>
+
+            <div class="form-group col-6" *ngIf="selectedRole !== 'Patient'">
+              <label for="address">Address</label>
+              <textarea
+                class="form-control"
+                id="address"
+                name="address"
+                rows="2"
+                placeholder="Enter your address"
+                [(ngModel)]="address"
+                required
+              ></textarea>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group col-6">
+              <label for="email">Email ID</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                [(ngModel)]="email"
+                required
+              />
+            </div>
+
+            <!-- Mobile No. (10-digit limit) -->
+            <div class="form-group col-6">
+              <label for="mobile">Mobile No.</label>
+              <input
+                type="tel"
+                class="form-control"
+                id="mobile"
+                name="mobile"
+                placeholder="Enter your mobile number"
+                [(ngModel)]="mobile"
+                pattern="[0-9]{10}"
+                maxlength="10"
+                required
+              />
+              <small *ngIf="mobile && mobile.length !== 10" class="text-danger">
+                Mobile number must be exactly 10 digits.
+              </small>
+            </div>
+
+            <!-- Password (4-digit limit) -->
+            <div class="form-group col-6">
+              <label for="password">Set Password (4 numbers)</label>
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                pattern="\d{4}"
+                placeholder="Enter 4-digit password"
+                [(ngModel)]="password"
+                minlength="4"
+                maxlength="4"
+                required
+              />
+              <small
+                *ngIf="password && password.length !== 4"
+                class="text-danger"
+              >
+                Password must be exactly 4 digits.
+              </small>
+            </div>
+
+            <!-- Confirm Password (Must match Password) -->
+            <div class="form-group col-6">
+              <label for="confirmPassword">Confirm Password</label>
+              <input
+                type="password"
+                class="form-control"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="Confirm your password"
+                [(ngModel)]="confirmPassword"
+                required
+              />
+              <small
+                *ngIf="confirmPassword && confirmPassword !== password"
+                class="text-danger"
+              >
+                Passwords do not match.
+              </small>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-dark btn-block mt-3 col-12"
+              (click)="register()"
+            >
+              Sign Up
+            </button>
+          </form>
+          <div
+            class="redirect-text pt-2 col-12 text-center fw-semiBold"
+            (click)="redirect()"
+          >
+            <i>Already have an account? Login here</i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,113 @@
+<div class="admin container-fluid d-flex">
+    <!-- Toggle Button -->
+    <button class="btn btn-dark toggle-btn" (click)="toggleSidebar()">☰</button>
+
+    <!-- Sidebar -->
+    <div class="side-nav" [class.open]="isSidebarOpen">
+        <h6>Lab</h6>
+        <ul class="nav flex-column gap-2">
+            <li class="nav-item" [class.active]="show === 'dashboard'" (click)="showContent('dashboard')">
+                <a class="nav-link"><i class="bi bi-grid"></i> Dashboard</a>
+            </li>
+            <li class="nav-item" [class.active]="show === 'setting'" (click)="showContent('setting')">
+                <a class="nav-link"><i class="bi bi-gear"></i> Settings</a>
+            </li>
+        </ul>
+
+        <h6>Services</h6>
+        <ul class="nav flex-column gap-2">
+            <li class="nav-item" *ngFor="let service of services" (click)="showServicePatients(service.name)">
+                <a class="nav-link"><i class="bi bi-briefcase"></i> {{ service.name }}</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="side-content">
+        <!-- Dashboard -->
+        <div class="container mt-4" *ngIf="show == 'dashboard'">
+            <h3 class="fw-bold">Dashboard Overview</h3>
+            <div class="row mt-3">
+                <div class="col-md-4 mb-4" *ngFor="let card of dashboardData">
+                    <div class="card custom-card">
+                        <div class="card-body text-center">
+                            <h5 class="fw-semibold">{{ card.title }}</h5>
+                            <h2 class="fw-bold">{{ card.value }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="container mt-4" *ngIf="show == 'setting'">
+            
+            <!-- Clinic Details -->
+            <div class="d-flex flex-column justify-content-center bg-dark text-white p-3 rounded">
+                <h3>Pathology Name</h3> 
+                <h6>Udaipur, <small>Address</small></h6>
+              </div>
+
+            <!-- Timing Schedule -->
+            <div class="card p-3 shadow border mt-3">
+                <h5>Daily Schedule</h5>
+                <form [formGroup]="scheduleForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Schedule 1</label>
+                            <input formControlName="schedule1From" type="time" class="form-control">
+                            <input formControlName="schedule1To" type="time" class="form-control mt-2">
+                        </div>
+                        <div class="col-md-6">
+                            <label>Schedule 2</label>
+                            <input formControlName="schedule2From" type="time" class="form-control">
+                            <input formControlName="schedule2To" type="time" class="form-control mt-2">
+                        </div>
+                    </div>
+                    <button class="btn btn-dark mt-3" (click)="saveSchedule()">Add</button>
+                </form>
+            </div>
+
+            <!-- Services -->
+            <div class="card p-3 shadow border mt-3">
+                <h5>Services</h5>
+                <form [formGroup]="serviceForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Service Name</label>
+                            <input formControlName="serviceName" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label>Fee</label>
+                            <input formControlName="fee" type="number" class="form-control">
+                        </div>
+                    </div>
+                    <button class="btn btn-dark mt-3" (click)="addService()">Add</button>
+                </form>
+            </div>
+
+            <!-- Staff Management -->
+            <div class="card p-3 shadow border mt-3">
+                <h5>Staff Management</h5>
+                <form [formGroup]="staffForm">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Staff Name</label>
+                            <input formControlName="name" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label>Mobile No</label>
+                            <input formControlName="mobile" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label>Password</label>
+                            <input formControlName="password" type="password" class="form-control">
+                        </div>
+                    </div>
+                    <button class="btn btn-dark mt-3" (click)="addStaff()">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+cre

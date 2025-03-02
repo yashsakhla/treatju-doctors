@@ -1,0 +1,20 @@
+<div class="dropdown position-relative">
+    <input 
+      #dropdownInput
+      type="text" 
+      class="form-control" 
+      placeholder="Search for a city..." 
+      [(ngModel)]="searchTerm" 
+      (focus)="toggleDropdown()" 
+      (input)="filterCities()" 
+    />
+    <div class="dropdown-menu w-100" *ngIf="isDropdownVisible && filteredCities.length > 0">
+      <button 
+        class="dropdown-item" 
+        *ngFor="let city of filteredCities" 
+        (mousedown)="selectCity(city)">
+        {{ city }}
+      </button>
+    </div>
+  </div>
+  

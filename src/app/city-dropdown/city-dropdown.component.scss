@@ -1,0 +1,25 @@
+.dropdown {
+    position: relative;
+    width: 100%;
+  }
+  
+  .dropdown-menu {
+    display: block;  /* Ensure dropdown is visible */
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 200px; /* Prevent excessive height */
+    overflow-y: auto;
+    z-index: 1050; /* Ensure it's above other elements */
+  }
+  
+  
+  .dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  
+  .dropdown-item:hover {
+    background: #f0f0f0;
+  }
+  

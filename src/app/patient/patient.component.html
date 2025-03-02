@@ -1,0 +1,155 @@
+<div class="client-user p-4" *ngIf="eventObj">
+    <div class="d-flex gap-3 justify-content-center align-items-center">
+        <button type="button" class="btn btn-outline-dark" [class.active]="btn.active" *ngFor="let btn of buttons" (click)="toggleActiveButton(btn.key)">{{btn.name}} <div class="notification">{{btn.notification}}</div> </button>
+    </div>
+
+    <div class="show-content pt-5">
+        <div class="row" *ngIf="showContent.length > 0">
+          <div class="container mt-4" *ngIf="btnName == 'Free Camp'">       
+            <div class="container" *ngFor="let data of showContent">
+              <h4 class="fw-bold text-left mb-3">{{ data.name }}</h4>
+              <div class="table-responsive">
+                <table class="table shadow-sm">
+                  <thead class="table-dark">
+                    <tr>
+                      <th scope="col" class="text-sm py-2">Date & Time</th>
+                      <th scope="col" class="text-sm py-2">Doctor Name</th>
+                      <th scope="col" class="text-sm py-2">Place</th>
+                      <th scope="col" class="text-sm py-2">Booking</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let doc of data.doctors">
+                      <!-- Date & Time Column -->
+                      <td class="text-sm py-2 px-2">
+                        <div>{{ data.date | date:'dd-MM-yy' }}</div>
+                        <div class="small text-muted">{{ data.startTime | date:'h a' }} to {{ data.endTime | date:'h a' }}</div>
+                      </td>
+              
+                      <!-- Doctors Column -->
+                      <td class="text-sm py-2 px-2">
+                        {{doc}}
+                      </td>
+              
+                      <!-- Place Column -->
+                      <td class="text-sm py-2 px-2">{{ data.place }}</td>
+              
+                      <!-- Booking Column -->
+                      <td class="text-sm py-2 px-2">
+                        <button type="button" class="btn btn-primary btn-sm w-100"
+                          [disabled]="false" 
+                          (click)="bookCamp(data, doc)">
+                          <i class="bi bi-calendar-check"></i> Book
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+            </div>
+            
+          </div>
+          <div class="container mt-4" *ngIf="btnName == 'Visit Doctor'">       
+            <div class="container">
+              <h4 class="fw-bold text-left mb-3">Doctors List</h4>
+              <div class="table-responsive">
+                <table class="table shadow-sm">
+                  <thead class="table-dark">
+                    <tr>
+                      <th scope="col">Date & Time</th>
+                      <th scope="col">Doctor Name</th>
+                      <th scope="col">Place</th>
+                      <th scope="col">Booking</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let data of showContent">
+                      <!-- Date & Time Column -->
+                      <td class="">
+                        <div>{{ data.date | date:'dd-MM-yy' }}</div>
+                        <div class="small text-muted">{{ data.startTime | date:'h a' }} to {{ data.endTime | date:'h a' }}</div>
+                      </td>
+            
+                      <!-- Doctors Column -->
+                      <td>
+                        {{data.name}}
+                      </td>
+            
+                      <!-- Place Column -->
+                      <td class="">{{ data.place }}</td>
+            
+                      <!-- Booking Column -->
+                      <td>
+                        <button type="button" class="btn btn-primary w-100"
+                                  [disabled]="false" 
+                                  (click)="bookDoctor(data)">
+                                  <i class="bi bi-calendar-check"></i> 
+                                  Book Now
+                          </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+          </div>
+
+          <div *ngIf="btnName == 'Labs' || btnName == 'Hospitals'">
+              <div class="col-sm-4" *ngFor="let data of showContent">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">{{data.name}} <span *ngIf="data.category">({{data.category}})</span> </h5>
+                    <p class="card-text">{{data.place}}</p>
+                    <button type="button" class="btn col-12 btn-success" [disabled]="data.booked" (click)="openModal(data)"><p *ngIf="!data.booked">Book Now</p> <p *ngIf="data.booked">Already Booked</p></button>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+        <div class="no-content d-flex flex-column justify-content-center align-items-center" *ngIf="!(showContent.length > 0)">
+          <img src="assets/images/no-result.png" alt="" style="width: 12rem;">
+            <h2>There is No {{btnName}} Available</h2>
+        </div>
+    </div>
+</div>
+
+<div class="select-text p-4 d-flex flex-column justify-content-center align-items-center" *ngIf="!eventObj">
+  <img src="assets/images/city.png" alt="" style="width: 12rem;">
+    <h2 class="pt-2">Please Search for Your city to check Events</h2>
+</div>
+<!-- Modal -->
+<div class="modal fade" #myModal tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      
+      <!-- Modal Header -->
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold" id="modalLabel">Book Your {{btnName}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <label class="form-label fw-semibold mb-1 pt-2">{{btnName}} Name</label>
+        <input class="form-control" type="text" [disabled]="true" [value]= "modalData?.name">
+
+        <label class="form-label fw-semibold mb-1 pt-4">Select Service</label>
+        <select class="form-select mb-3">
+          <option selected disabled>Select-Service</option>
+          <option *ngFor="let data of modalData?.category">{{data}}</option>
+        </select>
+
+        <label class="form-label fw-semibold mb-1 pt-2" >Select Date</label>
+        <input class="form-control" type="date" [min]="today">
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-success w-100 fw-bold" (click)="book()">Book Now</button>
+      </div>
+
+    </div>
+  </div>
+</div>

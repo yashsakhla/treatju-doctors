@@ -1,0 +1,95 @@
+<div class="card card-body mt-2">
+    <h4 class="mb-3">{{ existingEvent ? 'Edit Event' : 'Create Event' }}</h4>
+
+    <form [formGroup]="eventForm" (ngSubmit)="submitEvent()">
+        <!-- Row 1: Event Name, Start Date, End Date -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Event Name</label>
+                <input type="text" class="form-control" formControlName="eventName" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" formControlName="startDate" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" formControlName="endDate" required>
+            </div>
+        </div>
+
+        <div class="container mt-3">
+            <div class="row">
+              <!-- Add Doctors -->
+              <div class="col-md-6">
+                <label class="form-label">Add Doctors</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" #doctorInput>
+                  <button class="btn btn-success" type="button" (click)="addDoctor(doctorInput.value); doctorInput.value=''">Add</button>
+                </div>
+                <!-- Doctors List Below -->
+                <div class="mt-2" *ngIf="doctors.length">
+                  <div *ngFor="let doctor of doctors; let i = index" class="d-flex justify-content-between align-items-center p-2 border rounded">
+                    {{ doctor }}
+                    <button class="btn btn-sm btn-danger" (click)="removeDoctor(i)">Remove</button>
+                  </div>
+                </div>
+              </div>
+          
+              <!-- Add Nurses -->
+              <div class="col-md-6">
+                <label class="form-label">Add Nurses</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" #nurseInput>
+                  <button class="btn btn-success" type="button" (click)="addNurse(nurseInput.value); nurseInput.value=''">Add</button>
+                </div>
+                <!-- Nurses List Below -->
+                <div class="mt-2" *ngIf="nurses.length">
+                  <div *ngFor="let nurse of nurses; let i = index" class="d-flex justify-content-between align-items-center p-2 border rounded">
+                    {{ nurse }}
+                    <button class="btn btn-sm btn-danger" (click)="removeNurse(i)">Remove</button>
+                  </div>
+                </div>
+              </div>
+          
+              <!-- Add Admins -->
+              <div class="col-md-6 mt-3">
+                <label class="form-label">Add Admins</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" #adminInput>
+                  <button class="btn btn-success" type="button" (click)="addAdmin(adminInput.value); adminInput.value=''">Add</button>
+                </div>
+                <!-- Admins List Below -->
+                <div class="mt-2" *ngIf="admins.length">
+                  <div *ngFor="let admin of admins; let i = index" class="d-flex justify-content-between align-items-center p-2 border rounded">
+                    {{ admin }}
+                    <button class="btn btn-sm btn-danger" (click)="removeAdmin(i)">Remove</button>
+                  </div>
+                </div>
+              </div>
+          
+              <!-- Add Services -->
+              <div class="col-md-6 mt-3">
+                <label class="form-label">Service Offering</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" #serviceInput>
+                  <button class="btn btn-success" type="button" (click)="addService(serviceInput.value); serviceInput.value=''">Add</button>
+                </div>
+                <!-- Services List Below -->
+                <div class="mt-2" *ngIf="services.length">
+                  <div *ngFor="let service of services; let i = index" class="d-flex justify-content-between align-items-center p-2 border rounded">
+                    {{ service }}
+                    <button class="btn btn-sm btn-danger" (click)="removeService(i)">Remove</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        <!-- Action Buttons -->
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">{{ existingEvent ? 'Update' : 'Save' }}</button>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+        </div>
+    </form>
+</div>

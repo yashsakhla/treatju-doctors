@@ -1,0 +1,82 @@
+.auth-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, #ff512f, #dd2476);
+  }
+  
+  .card {
+    border-radius: 12px;
+  }
+  
+  h3 {
+    font-weight: bold;
+  }
+  
+  .btn-dark {
+    background-color: #000;
+    border-radius: 8px;
+  }
+  
+  .btn-dark:hover {
+    background-color: #333;
+  }
+  
+  .form-control {
+    border-radius: 8px;
+  }
+  
+  .form-check-input {
+    cursor: pointer;
+  }
+  
+  label {
+    font-weight: 500;
+    margin-left: 5px;
+    cursor: pointer;
+    padding-top: 1rem;
+  }
+  
+  .redirect-text{
+    cursor: pointer;
+  }
+
+  .form-check{
+    label{
+        padding-top: 0;
+    }
+  }
+
+  .logo{
+    width: 12rem;
+  }
+
+  .dropdown {
+    position: relative;
+    margin-top: 1px;
+    width: 100%;
+    .form-control {
+      border-radius: 0.25rem;
+      border: 1px solid #ced4da;
+      &:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+    }
+  
+    .dropdown-menu {
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: block; // Ensure the dropdown is displayed
+      box-shadow:  0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+  
+    .dropdown-item {
+      cursor: pointer;
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
+  }

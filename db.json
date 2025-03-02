@@ -1,0 +1,344 @@
+{
+  "users": [
+    {
+      "id": "2088",
+      "userName": "jhsd",
+      "age": null,
+      "city": "Mumbai",
+      "address": "asdsa",
+      "mobile": "1111111111",
+      "email": "asdasd",
+      "password": "1234",
+      "role": "Organizer",
+      "data": []
+    },
+    {
+      "id": "395a",
+      "userName": "asd",
+      "age": null,
+      "city": "Mumbai",
+      "address": "asdasd",
+      "mobile": "1212121212",
+      "email": "asdasd",
+      "password": "1234",
+      "role": "Organizer",
+      "data": {
+        "eventDetails": [
+          {
+            "eventName": "wqeww",
+            "eventPlace": "qweqwe",
+            "eventDate": "2025-03-15",
+            "startTime": "00:15",
+            "endTime": "02:11"
+          }
+        ]
+      }
+    },
+    {
+      "id": "3c83",
+      "userName": "qq",
+      "age": null,
+      "city": "Mumbai",
+      "address": "qw",
+      "mobile": "9999999999",
+      "email": "qw",
+      "password": "1234",
+      "role": "Organizer",
+      "data": {
+        "eventDetails": [
+          {
+            "eventName": "qwqw",
+            "eventPlace": "qwqw",
+            "eventDate": "2025-03-08",
+            "startTime": "01:37",
+            "endTime": "01:39"
+          }
+        ]
+      }
+    },
+    {
+      "id": "fc30",
+      "userName": "y",
+      "age": null,
+      "city": "Mumbai",
+      "address": "we",
+      "mobile": "0000000001",
+      "email": "qwe",
+      "password": "1234",
+      "role": "Organizer",
+      "data": {
+        "eventDetails": [
+          {
+            "eventName": "123",
+            "eventPlace": "123",
+            "eventDate": "2025-03-08",
+            "startTime": "01:45",
+            "endTime": "01:46"
+          }
+        ]
+      }
+    },
+    {
+      "id": "323d",
+      "userName": "1234",
+      "age": null,
+      "city": "Nagpur",
+      "address": "plot no 13, Maa bhagwati nagar, near maa bhagwati mandir",
+      "mobile": "1313131313",
+      "email": "yashsakhla33@gmail.com",
+      "password": "1234",
+      "role": "Organizer",
+      "data": {
+        "eventDetails": [],
+        "doctors": [],
+        "staff": []
+      }
+    },
+    {
+      "id": "b12d",
+      "userName": "cc",
+      "age": null,
+      "city": "Mumbai",
+      "address": "asd",
+      "mobile": "7777777777",
+      "email": "asd",
+      "password": "1234",
+      "role": "Organizer",
+      "data": {
+        "doctors": [
+          {
+            "name": "qwe",
+            "address": "qwe",
+            "mobile": "1232312312",
+            "pass": "qwwe"
+          }
+        ]
+      }
+    },
+    {
+      "id": "b086",
+      "userName": "yash",
+      "age": null,
+      "city": "Delhi",
+      "address": "12",
+      "mobile": "2424242424",
+      "email": "12",
+      "password": "1234",
+      "role": "Organizer",
+      "data": {
+        "doctors": [
+          {
+            "name": "123",
+            "address": "213",
+            "mobile": "1231231232",
+            "pass": "12323"
+          }
+        ]
+      }
+    },
+    {
+      "id": "2b3c",
+      "userName": "1",
+      "age": null,
+      "city": "Delhi",
+      "address": "12",
+      "mobile": "6666666666",
+      "email": "12",
+      "password": "1234",
+      "role": "Organizer",
+      "data": {
+        "eventDetails": [
+          {
+            "eventName": "free camp 1",
+            "eventPlace": "123",
+            "eventDate": "2025-03-15",
+            "startTime": "02:05",
+            "endTime": "04:02"
+          }
+        ],
+        "doctors": [
+          {
+            "name": "123",
+            "address": "123",
+            "mobile": "1232123222",
+            "pass": "1233"
+          },
+          {
+            "name": "123",
+            "address": "123",
+            "mobile": "1232322321",
+            "pass": "12323"
+          }
+        ],
+        "staff": [
+          {
+            "name": "123",
+            "address": "123",
+            "mobile": "1231232323",
+            "pass": "12323"
+          }
+        ]
+      }
+    },
+    {
+      "id": "84c8",
+      "userName": "1",
+      "age": null,
+      "city": "Kolkata",
+      "address": "123232",
+      "mobile": "4444444444",
+      "email": "yashsakhla33@gmail.com",
+      "password": "1234",
+      "role": "Organizer",
+      "data": {
+        "eventDetails": [
+          {
+            "eventName": "free camp 2",
+            "eventPlace": "123",
+            "eventDate": "2025-03-15",
+            "startTime": "02:11",
+            "endTime": "02:13"
+          }
+        ],
+        "doctors": [
+          {
+            "name": "123",
+            "address": "123",
+            "mobile": "1232332211",
+            "pass": "123"
+          },
+          {
+            "name": "Dr ram",
+            "address": "asdasd",
+            "mobile": "1212121212",
+            "pass": "1223"
+          }
+        ],
+        "staff": [
+          {
+            "name": "asd",
+            "address": "asd",
+            "mobile": "1233434343",
+            "pass": "1233"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bd2f",
+      "userName": "qq",
+      "age": null,
+      "city": "Bangalore",
+      "address": "qwqw",
+      "mobile": "9090909090",
+      "email": "qwqw",
+      "password": "1234",
+      "role": "Doctor",
+      "data": {
+        "visitDetails": [
+          {
+            "visitCampPlace": "qwq",
+            "visitDate": "2025-03-15",
+            "timeFrom": "15:09",
+            "timeTo": "15:10",
+            "patientFee": 100
+          }
+        ],
+        "staff": [
+          {
+            "name": "12",
+            "address": "12",
+            "mobile": "1221212112",
+            "pass": "1212"
+          }
+        ]
+      }
+    },
+    {
+      "id": "d082",
+      "userName": "w",
+      "age": 12,
+      "city": "",
+      "address": "",
+      "mobile": "4545454545",
+      "email": "11",
+      "password": "1234",
+      "role": "Patient",
+      "data": {}
+    },
+    {
+      "id": "e62f",
+      "userName": "12",
+      "age": null,
+      "city": "Mumbai",
+      "address": "123",
+      "mobile": "6767676767",
+      "email": "123",
+      "password": "1234",
+      "role": "Doctor",
+      "data": {
+        "visitDetails": [
+          {
+            "visitCampPlace": "jodhpur",
+            "visitDate": "2025-03-15",
+            "timeFrom": "18:18",
+            "timeTo": "17:22",
+            "patientFee": 120
+          }
+        ],
+        "staff": []
+      }
+    },
+    {
+      "id": "309e",
+      "userName": "123",
+      "age": null,
+      "city": "Mumbai",
+      "address": "123",
+      "mobile": "8768768768",
+      "email": "asdasd",
+      "password": "1234",
+      "role": "Doctor",
+      "data": {
+        "visitDetails": [
+          {
+            "visitCampPlace": "Jodhpur",
+            "visitDate": "2025-03-15",
+            "timeFrom": "21:34",
+            "timeTo": "18:39",
+            "patientFee": 123
+          }
+        ],
+        "staff": []
+      }
+    },
+    {
+      "id": "a1d7",
+      "userName": "qq",
+      "age": null,
+      "city": "Delhi",
+      "address": "qwe",
+      "mobile": "5656565656",
+      "email": "qweqwe",
+      "password": "1234",
+      "role": "Lab",
+      "data": {
+        "labDetails": []
+      }
+    },
+    {
+      "id": "e91e",
+      "userName": "12",
+      "age": null,
+      "city": "Delhi",
+      "address": "123",
+      "mobile": "0123012301",
+      "email": "123",
+      "password": "1234",
+      "role": "Lab",
+      "data": {
+        "labDetails": []
+      }
+    }
+  ]
+}

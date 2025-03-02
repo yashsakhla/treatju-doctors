@@ -1,0 +1,114 @@
+/* Sidebar Styling */
+.admin{
+    position: relative;
+    padding-left: 0;
+    padding-top: 2px;
+}
+.side-nav {
+    width: 0;
+    background: #fff;
+    color: black;
+    overflow-x: hidden;
+    position: relative;
+    top: 0;
+    left: 0;
+    transition: width 0.3s ease-in-out;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* When sidebar is open */
+.side-nav.open {
+    width: 250px;
+    padding: 1rem;
+}
+
+/* Sidebar links */
+.nav-link {
+    color: black;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 13.5px;
+}
+
+.nav-link:hover {
+    background: #f0f0f0;
+}
+
+/* Button Styling */
+.toggle-btn {
+    position: relative;
+    z-index: 1000;
+}
+
+/* Main Content */
+.side-content {
+    padding: 20px;
+    width: 100%;
+}
+
+.table-container {
+    margin: auto;
+    padding-top: 0;
+
+h2 {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.table {
+    width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.pagination {
+    margin-top: 15px;
+}
+
+.page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+}
+
+.active{
+    background-color: #00000038;
+    border-radius: 10px;
+}
+
+h6{
+    padding-top: 10px;
+}
+
+.custom-card {
+    background: #ffffff; /* White Background */
+    border: 1px solid #e0e0e0; /* Light Border */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Soft Box Shadow */
+    border-radius: 8px; /* Rounded Corners */
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .custom-card:hover {
+    transform: translateY(-5px); /* Hover Effect */
+  }
+  
+  .card-body {
+    padding: 20px;
+  }
+  
+  h2 {
+    color: #007bff; /* Blue Text */
+  }
+  
+  .row {
+    justify-content: center; /* Centers the cards */
+  }
+
+  h6{
+    padding-top: 0;
+  }
+  
