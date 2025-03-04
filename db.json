@@ -339,6 +339,49 @@
       "data": {
         "labDetails": []
       }
+    },
+    {
+      "id": "cdac",
+      "userName": "1",
+      "age": 12,
+      "city": "",
+      "address": "",
+      "mobile": "8908908908",
+      "email": "yashsakhla33@gmail.com",
+      "password": "1234",
+      "role": "Patient",
+      "data": {}
+    },
+    {
+      "id": "8dfe",
+      "userName": "wewe",
+      "age": null,
+      "city": "Mumbai",
+      "address": "asd",
+      "mobile": "1212231212",
+      "email": "asd",
+      "password": "1234",
+      "role": "Organizer",
+      "data": {
+        "eventDetails": [
+          {
+            "eventName": "Satyam Event",
+            "eventPlace": "Lal;burra ",
+            "eventDate": "2025-03-13",
+            "startTime": "17:01",
+            "endTime": "19:02"
+          }
+        ],
+        "doctors": [
+          {
+            "name": "Dr yash",
+            "address": "jnasjd",
+            "mobile": "9808908098",
+            "pass": "1234"
+          }
+        ],
+        "staff": []
+      }
     }
   ]
 }

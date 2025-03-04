@@ -1,42 +1,67 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  Renderer2,
+} from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RestService } from '../core/rest/rest.service';
+import { RestService } from '../../core/rest/rest.service';
 import bootstrap from 'bootstrap';
-import { AuthService } from '../core/auth/auth.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
-import { Popover } from 'bootstrap'; // ✅ Correct
-import { CitiesDirective } from '../core/directive/cities.directive';
+import { Popover } from 'bootstrap';
 import { CityDropdownComponent } from '../city-dropdown/city-dropdown.component';
-
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule,CityDropdownComponent],
+  imports: [CommonModule, FormsModule, CityDropdownComponent],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  styleUrl: './header.component.scss',
 })
 export class HeaderComponent implements OnInit, AfterViewInit {
-  clicked:boolean=false;
+  clicked: boolean = false;
   isDropdownVisible: boolean = false;
-  selectedCity!:string
+  selectedCity!: string;
   private popoverInstance: bootstrap.Popover | null = null;
+  loggedIn:boolean = false;
 
-  @Input() showSearch !: boolean;
+  @Input() showSearch!: boolean;
 
   selectedCityFromDropdown: string = ''; // Store city from dropdown
-  
 
+  constructor(
+    private rest: RestService,
+    public auth: AuthService,
+    private router: Router,
+    private elRef: ElementRef,
+    private renderer: Renderer2
+  ) {}
 
-  constructor(private rest:RestService, public auth:AuthService, private router:Router, private elRef: ElementRef,private renderer: Renderer2) { }
   ngOnInit(): void {
-
+    this.loggedIn = this.auth.isUserLoggedIn;
+    setInterval(() => {
+      this.nextSlide();
+    }, 3000);
   }
 
+  slides = [
+    'assets/images/banner-1.jpeg',
+    'assets/images/banner-2.jpeg',
+    'assets/images/banner-3.jpeg'
+  ];
+  currentIndex = 0;
+
   ngAfterViewInit(): void {
-    const popoverTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    popoverTriggerList.forEach(popoverTriggerEl => new Popover(popoverTriggerEl));
+    const popoverTriggerList = Array.from(
+      document.querySelectorAll('[data-bs-toggle="popover"]')
+    );
+    popoverTriggerList.forEach(
+      (popoverTriggerEl) => new Popover(popoverTriggerEl)
+    );
 
     document.addEventListener('click', (event: any) => {
       if (event.target && event.target.id === 'logoutBtn') {
@@ -46,7 +71,9 @@ export class HeaderComponent implements OnInit, AfterViewInit {
       }
     });
 
-    const popoverTrigger = this.elRef.nativeElement.querySelector('[data-bs-toggle="popover"]');
+    const popoverTrigger = this.elRef.nativeElement.querySelector(
+      '[data-bs-toggle="popover"]'
+    );
 
     if (popoverTrigger) {
       this.popoverInstance = new Popover(popoverTrigger, { trigger: 'manual' });
@@ -67,7 +94,8 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
   togglePopover() {
     if (this.popoverInstance) {
-      const isVisible = this.elRef.nativeElement.querySelector('.popover') !== null;
+      const isVisible =
+        this.elRef.nativeElement.querySelector('.popover') !== null;
       isVisible ? this.hidePopover() : this.popoverInstance.show();
     }
   }
@@ -78,19 +106,25 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     }
   }
 
-  click(){
+  click() {
     this.clicked = !this.clicked;
   }
 
-
   handleCitySelection(city: string) {
     this.selectedCityFromDropdown = city;
-    this.rest.checkCityEvent(this.selectedCityFromDropdown)
+    this.rest.checkCityEvent(this.selectedCityFromDropdown);
   }
 
-
-  redirect(path:string){
+  redirect(path: string) {
     this.router.navigate([path]);
   }
-}
 
+  nextSlide() {
+    this.currentIndex = (this.currentIndex + 1) % this.slides.length;
+  }
+
+  prevSlide() {
+    this.currentIndex =
+      (this.currentIndex - 1 + this.slides.length) % this.slides.length;
+  }
+}

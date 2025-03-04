@@ -1,7 +1,18 @@
-<div class="client-user p-4" *ngIf="eventObj">
-    <div class="d-flex gap-3 justify-content-center align-items-center">
-        <button type="button" class="btn btn-outline-dark" [class.active]="btn.active" *ngFor="let btn of buttons" (click)="toggleActiveButton(btn.key)">{{btn.name}} <div class="notification">{{btn.notification}}</div> </button>
-    </div>
+<div class="client-user" *ngIf="eventObj">
+  <div class="btn-row d-flex gap-1 justify-content-between align-items-center px-1 py-1">
+    <button 
+      type="button" 
+      class="btn position-relative"
+      [class.active]="btn.key === activeButton"
+      *ngFor="let btn of buttons" 
+      (click)="toggleActiveButton(btn.key)">
+      {{ btn.name }}
+      <span *ngIf="btn.notification > 0" class="badge bg-danger position-absolute top-0 end-0 translate-middle">
+        {{ btn.notification }}
+      </span>
+    </button>
+  </div>
+  
 
     <div class="show-content pt-5">
         <div class="row" *ngIf="showContent.length > 0">
@@ -12,34 +23,34 @@
                 <table class="table shadow-sm">
                   <thead class="table-dark">
                     <tr>
-                      <th scope="col" class="text-sm py-2">Date & Time</th>
-                      <th scope="col" class="text-sm py-2">Doctor Name</th>
-                      <th scope="col" class="text-sm py-2">Place</th>
-                      <th scope="col" class="text-sm py-2">Booking</th>
+                      <th scope="col" class="text-sm text-muted py-3 text-truncate">Date & Time</th>
+                      <th scope="col" class="text-sm text-muted py-3 text-truncate">Doctor Name</th>
+                      <th scope="col" class="text-sm text-muted py-3">Place</th>
+                      <th scope="col" class="text-sm text-muted py-3" style="text-align: right;">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let doc of data.doctors">
                       <!-- Date & Time Column -->
-                      <td class="text-sm py-2 px-2">
-                        <div>{{ data.date | date:'dd-MM-yy' }}</div>
+                      <td class="text-sm py-3 px-2">
+                        <div class="fw-600">{{ data.date | date:'dd-MM-yy' }}</div>
                         <div class="small text-muted">{{ data.startTime | date:'h a' }} to {{ data.endTime | date:'h a' }}</div>
                       </td>
               
                       <!-- Doctors Column -->
-                      <td class="text-sm py-2 px-2">
+                      <td class="text-sm py-3 px-2 fw-600">
                         {{doc}}
                       </td>
               
                       <!-- Place Column -->
-                      <td class="text-sm py-2 px-2">{{ data.place }}</td>
+                      <td class="text-sm py-3 px-2 fw-600">{{ data.place }}</td>
               
                       <!-- Booking Column -->
-                      <td class="text-sm py-2 px-2">
-                        <button type="button" class="btn btn-primary btn-sm w-100"
+                      <td class="text-sm py-3 px-2 text-right" style="text-align: right;">
+                        <button type="button" class="btn btn-dark btn-sm px-3 py-2"
                           [disabled]="false" 
                           (click)="bookCamp(data, doc)">
-                          <i class="bi bi-calendar-check"></i> Book
+                          <i class="bi bi-calendar-check"></i> Book Now
                         </button>
                       </td>
                     </tr>
@@ -48,7 +59,6 @@
               </div>
               
             </div>
-            
           </div>
           <div class="container mt-4" *ngIf="btnName == 'Visit Doctor'">       
             <div class="container">
@@ -57,36 +67,35 @@
                 <table class="table shadow-sm">
                   <thead class="table-dark">
                     <tr>
-                      <th scope="col">Date & Time</th>
-                      <th scope="col">Doctor Name</th>
-                      <th scope="col">Place</th>
-                      <th scope="col">Booking</th>
+                      <th scope="col" class="text-sm text-muted py-3 text-truncate">Date & Time</th>
+                      <th scope="col" class="text-sm text-muted py-3 text-truncate">Doctor Name</th>
+                      <th scope="col" class="text-sm text-muted py-3">Place</th>
+                      <th scope="col" class="text-sm text-muted py-3" style="text-align: right;">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let data of showContent">
                       <!-- Date & Time Column -->
-                      <td class="">
-                        <div>{{ data.date | date:'dd-MM-yy' }}</div>
+                      <td class="text-sm py-3 px-2">
+                        <div class="fw-600">{{ data.date | date:'dd-MM-yy' }}</div>
                         <div class="small text-muted">{{ data.startTime | date:'h a' }} to {{ data.endTime | date:'h a' }}</div>
                       </td>
-            
+              
                       <!-- Doctors Column -->
-                      <td>
+                      <td class="text-sm py-3 px-2 fw-600">
                         {{data.name}}
                       </td>
-            
+              
                       <!-- Place Column -->
-                      <td class="">{{ data.place }}</td>
-            
+                      <td class="text-sm py-3 px-2 fw-600">{{ data.place }}</td>
+              
                       <!-- Booking Column -->
-                      <td>
-                        <button type="button" class="btn btn-primary w-100"
-                                  [disabled]="false" 
-                                  (click)="bookDoctor(data)">
-                                  <i class="bi bi-calendar-check"></i> 
-                                  Book Now
-                          </button>
+                      <td class="text-sm py-3 px-2 text-right" style="text-align: right;">
+                        <button type="button" class="btn btn-dark btn-sm px-3 py-2"
+                          [disabled]="false" 
+                          (click)="bookDoctor(data)">
+                          <i class="bi bi-calendar-check"></i> Book Now
+                        </button>
                       </td>
                     </tr>
                   </tbody>
@@ -98,13 +107,26 @@
 
           <div *ngIf="btnName == 'Labs' || btnName == 'Hospitals'">
               <div class="col-sm-4" *ngFor="let data of showContent">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">{{data.name}} <span *ngIf="data.category">({{data.category}})</span> </h5>
-                    <p class="card-text">{{data.place}}</p>
-                    <button type="button" class="btn col-12 btn-success" [disabled]="data.booked" (click)="openModal(data)"><p *ngIf="!data.booked">Book Now</p> <p *ngIf="data.booked">Already Booked</p></button>
+                <div class="card shadow-sm">
+                  <div class="card-header bg-light py-3">
+                    <h3 class="mb-0">{{ data.name }}</h3>
+                  </div>
+                  <div class="card-body bg-white">
+                    <p class="text-muted mb-2">{{ data.place }}</p>
+                    
+                    <h6 class="fw-bold">Available Services:</h6>
+                    <ul class="mb-4">
+                      <li *ngFor="let service of data.category">{{ service }}</li>
+                    </ul>
+                    
+                    <div class="d-flex justify-content-end">
+                      <button type="button" class="btn btn-dark" [disabled]="data.booked" (click)="openModal(data)">
+                        {{ data.booked ? 'Already Booked' : 'Book Now' }}
+                      </button>
+                    </div>
                   </div>
                 </div>
+                
               </div>
           </div>
         </div>

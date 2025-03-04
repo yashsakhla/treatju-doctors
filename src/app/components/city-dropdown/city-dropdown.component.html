@@ -1,0 +1,31 @@
+<div class="dropdown position-relative">
+  <input 
+    type="text"
+    class="form-control"
+    placeholder="Click to search..." 
+    [(ngModel)]="selectedCity"
+    (click)="openDropdown()"
+    readonly
+  />
+  <div class="dropdown-menu w-100 p-2" *ngIf="isDropdownVisible">
+    <input 
+      type="text" 
+      class="form-control mb-2"
+      placeholder="Search for a city..." 
+      [(ngModel)]="searchTerm" 
+      (input)="filterCities()" 
+      #searchBox
+    />
+    <div *ngIf="filteredCities.length > 0">
+      <button 
+        class="dropdown-item" 
+        *ngFor="let city of filteredCities" 
+        (mousedown)="selectCity(city)">
+        {{ city }}
+      </button>
+    </div>
+    <div *ngIf="filteredCities.length === 0" class="text-muted text-center p-2">
+      No results found
+    </div>
+  </div>
+</div>

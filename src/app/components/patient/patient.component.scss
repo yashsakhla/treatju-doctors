@@ -1,10 +1,12 @@
 .client-user{
-    background: #f3f5f6;
+    background: #fff;
+    padding: 1rem 5rem;
 }
 
 button{
     font-weight: 600;
     position: relative;
+    color: #fff;
 }
 
 .notification{
@@ -19,21 +21,14 @@ button{
     top: -10px;
 }
 
-.active{
-    background: #00000017;
-    color: #000;
-}
+
 
 .card{
     background: #e4e4e768;
     .btn{
-        background:#22c55e ;
         border: none;
         padding: 0.6rem;
         margin-top: 1rem;
-    }
-    .btn:hover{
-        background-color: #29874b;
     }
 
     span{
@@ -111,9 +106,59 @@ table {
   .noBorder{
     border-bottom: none;
   }
+
+  .btn-transparent {
+    background: transparent;
+    border: none;
+    color: #6c757d;
+  }
+  
+  .btn-light {
+    background: white;
+    color: black;
+  }
+
+  .btn-row{
+    background-color: #f1f5f9;
+    border-radius: 10px;
+    button{
+      width: 23%;
+      min-width: fit-content;
+      color: #64748b;
+    }
+  }
+
+  .active{
+    background-color: #fff;
+    color: #000 !important;
+    border: none;
+    padding: 10px 0;
+  }
+
+  .card-header {
+    background-color: rgb(239 246 255); /* Light blue header */
+  }
+  
+  .card-body ul {
+    padding-left: 20px; /* Ensure list is aligned properly */
+  }
+  
+  .btn-dark {
+    min-width: 120px; /* Ensure consistent button width */
+  }
+
+  .card-header{
+    background-color: #eff6ff;
+  }
+  
+  
   
   /* Responsive Styling */
   @media (max-width: 768px) {
+    .client-user{
+      padding: 10px;
+  }
+  
     .table {
       font-size: 14px;
     }
@@ -121,5 +166,9 @@ table {
     .container{
         padding: 0;
     }
+
+    .show-content{
+      padding: 1rem !important;
+  }
   }
   

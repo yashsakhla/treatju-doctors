@@ -27,7 +27,7 @@ cities: string[] = [
     "Tirupati", "Kozhikode", "Gurgaon", "Noida", "Puducherry",
     "Agartala", "Imphal", "Shillong", "Aizawl", "Itanagar",
     "Gangtok", "Dimapur", "Kohima", "Dispur"
-  ];
+];
   @Output() citySelected = new EventEmitter<string>(); // Emit selected city
  searchTerm: string = '';// Store the selected city internally
  isDropdownVisible = false;
@@ -40,6 +40,13 @@ cities: string[] = [
 
  }
 
+
+openDropdown() {
+  this.isDropdownVisible = true;
+  setTimeout(() => document.getElementById('searchBox')?.focus(), 0);
+}
+
+
  toggleDropdown() {
    this.isDropdownVisible = true;
  }
@@ -51,6 +58,7 @@ cities: string[] = [
  }
 
  selectCity(city: string) {
+  console.log(city)
    this.selectedCity = city; // Store selected city in component
    this.searchTerm = city; // Show selected city in input field
    this.citySelected.emit(city); // Emit selected city to parent

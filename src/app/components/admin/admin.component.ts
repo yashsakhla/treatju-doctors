@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Offcanvas } from 'bootstrap';
 import { Subscription } from 'rxjs';
-import { RestService } from '../core/rest/rest.service';
+import { RestService } from '../../core/rest/rest.service';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,

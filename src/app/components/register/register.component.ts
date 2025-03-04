@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CityDropdownComponent } from '../city-dropdown/city-dropdown.component';
 import { HttpClient } from '@angular/common/http';
-import { RestService } from '../core/rest/rest.service';
+import { RestService } from '../../core/rest/rest.service';
 
 @Component({
   selector: 'app-register',

@@ -3,8 +3,8 @@ import { Component } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../core/auth/auth.service';
-import { RestService } from '../core/rest/rest.service';
+import { AuthService } from '../../core/auth/auth.service';
+import { RestService } from '../../core/rest/rest.service';
 
 @Component({
   selector: 'app-login',
@@ -31,6 +31,7 @@ export class LoginComponent {
 
     this.rest.login(data).subscribe((res:any)=>{
       console.log(res)
+      this.auth.isUserLoggedIn = true;
       this.rest.userData = res[0];
       if(res[0].role == "Patient"){
         this.router.navigate(['/user']);

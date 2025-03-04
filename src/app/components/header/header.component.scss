@@ -1,5 +1,5 @@
 .header{
-    background-color: #ffe047;
+    background-color: #facc15;
     .logo{
             width: 10rem;
     }
@@ -19,6 +19,14 @@
         font-size: 1.3rem;
         padding: 0.5rem 1rem;
         margin-bottom: 10px;
+        cursor: pointer;
+        &:hover{
+            background: #f4f4f5;
+            border-radius: 10px;
+        }
+    }
+
+    p{
         cursor: pointer;
         &:hover{
             background: #f4f4f5;
@@ -88,6 +96,18 @@
     }
 }
 
+.header-row{
+    height: 3.2rem;
+}
+
+.carousel{
+    padding: 2rem;
+    .carousel-inner{
+        max-height: 30rem;
+        border-radius: 15px;
+    }
+}
+
  /* Responsive Styling */
  @media (max-width: 768px) {
     .header-row{
@@ -95,5 +115,14 @@
     }
     .logo{
         width: 4rem !important;
+    }
+    .header-row{
+        height: 5.2rem;
+    }
+    h4{
+        text-align: center;
+    }
+    .carousel{
+        padding: 1rem;
     }
   }

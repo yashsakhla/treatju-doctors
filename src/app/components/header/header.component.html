@@ -1,0 +1,52 @@
+<div class="header container-fluid header py-3 px-0">
+  <div class="header-row d-flex justify-content-between align-items-center px-5">
+    <div class="d-flex align-items-center gap-2">
+      <img src="assets/images/logo.png" class="logo" alt="" />
+      <div
+        class="ml-4 search d-flex justify-content-center align-items-center gap-5 col-8"
+        *ngIf="showSearch"
+      >
+        <i
+          class="bi bi-search position-relative"
+          style="
+            top: 23px;
+            transform: translateY(-50%);
+            color: gray;
+            margin-bottom: 0;
+            left: 115%;
+            z-index: 1;
+          "
+        ></i>
+        <app-city-dropdown
+          class="col-12"
+          (citySelected)="handleCitySelection($event)"
+        ></app-city-dropdown>
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-2 justify-content-center">
+        <i class="bi bi-house-door fa-lg mr-3 mb-0"> </i>
+        <i class="bi bi-printer mb-0" *ngIf="!showSearch"></i>
+        <i class="bi bi-arrow-clockwise mb-0" *ngIf="!showSearch"></i>
+        <p class="d-flex justify-content-center align-items-center mb-0 p-2" (click)="redirect('login')"><i class="bi bi-person fa-lg mb-0 p-0"></i>{{loggedIn ? 'Logout':'Login'}}</p>
+    </div>
+  </div>
+  <hr>
+  <h4 class="px-5 m-0 fw-bold">HEALTH CARE BOOKING SYSTEM</h4> 
+</div>
+<div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <div *ngFor="let slide of slides; let i = index" class="carousel-item" [class.active]="i === 0">
+      <img [src]="slide" class="d-block w-100" alt="Slide Image">
+    </div>
+  </div>
+  
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev" (click)="prevSlide()">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next" (click)="nextSlide()">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>

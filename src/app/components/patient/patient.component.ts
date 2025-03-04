@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { RestService } from '../core/rest/rest.service';
+import { RestService } from '../../core/rest/rest.service';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Modal } from 'bootstrap';
@@ -45,11 +45,12 @@ export class PatientComponent implements OnInit {
   btnName:string = this.buttons[0].name;
   modalData:any;
   today: string = '';
+  activeButton = 'camp'
 
   private subscription!: Subscription;
   constructor(private rest:RestService){
       this.subscription = rest.eventDetails.subscribe((res:any)=>{
-        console.log('S',res)
+
         this.eventObj = res;
         this.updateNotifications(res,this.buttons);
       })
@@ -66,6 +67,8 @@ export class PatientComponent implements OnInit {
     this.modalInstance.show();
     this.modalData = data; // Opens modal
   }
+
+  
 
   bookCamp(data: any, doctor: string) {
     if (!data.bookedDoctors) {
@@ -96,6 +99,7 @@ export class PatientComponent implements OnInit {
   }
 
   toggleActiveButton(selectedKey: string) {
+    this.activeButton = selectedKey;
     this.buttons.forEach(button => {
       button.active = button.key === selectedKey;
       if(button.active){

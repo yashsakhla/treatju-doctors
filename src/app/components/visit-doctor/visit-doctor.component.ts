@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { RestService } from '../core/rest/rest.service';
+
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -9,6 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { EventFormComponentComponent } from '../event-form-component/event-form-component.component';
+import { RestService } from '../../core/rest/rest.service';
 
 interface Staff {
   name: string;

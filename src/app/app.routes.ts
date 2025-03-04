@@ -1,12 +1,13 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login.component';
-import { PatientComponent } from './patient/patient.component';
-import { RegisterComponent } from './register/register.component';
-import { AdminComponent } from './admin/admin.component';
-import { OrganizerComponent } from './organizer/organizer.component';
-import { VisitDoctorComponent } from './visit-doctor/visit-doctor.component';
-import { LabComponent } from './lab/lab.component';
-import { HospitalComponent } from './hospital/hospital.component';
+import { LoginComponent } from './components/login/login.component';
+import { PatientComponent } from './components/patient/patient.component';
+import { RegisterComponent } from './components/register/register.component';
+import { AdminComponent } from './components/admin/admin.component';
+import { OrganizerComponent } from './components/organizer/organizer.component';
+import { VisitDoctorComponent } from './components/visit-doctor/visit-doctor.component';
+import { LabComponent } from './components/lab/lab.component';
+import { HospitalComponent } from './components/hospital/hospital.component';
+
 
 export const routes: Routes = [
     {
