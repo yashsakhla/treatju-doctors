@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { api_url } from '../../../enviorment';
+import { TosterService } from '../toster/toster.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RestService {
 
-  constructor(private http:HttpClient) { }
+  constructor(private http:HttpClient, private toster:TosterService) { }
   private eventSubject = new BehaviorSubject<any>(null);
   eventDetails = this.eventSubject.asObservable();
   private loader = new BehaviorSubject<any>(false);
@@ -32,7 +33,8 @@ export class RestService {
          this.eventSubject.next(res);
         },
         error:()=>{
-
+          this.loader.next(false);
+          this.toster.showError("Error Fetching City, Please Contact Admin!","Erro Fetching City Details!");
         }
       }
     );
