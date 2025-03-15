@@ -111,4 +111,15 @@ h6{
   h6{
     padding-top: 0;
   }
+
+  .header{
+    background-color: #facc15;
+    padding: 0.8rem 1rem;
+    .right, .left{
+        p{
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+    }
+}
   

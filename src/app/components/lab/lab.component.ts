@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from '../../core/auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-lab',
@@ -9,7 +11,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
   templateUrl: './lab.component.html',
   styleUrl: './lab.component.scss'
 })
-export class LabComponent {
+export class LabComponent implements OnInit {
   isSidebarOpen = true;
   show: string = 'dashboard';
   services: { name: string }[] = [];
@@ -27,8 +29,9 @@ export class LabComponent {
   scheduleForm: FormGroup;
   serviceForm: FormGroup;
   staffForm: FormGroup;
+  loggedIn!:boolean;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private auth:AuthService, private router:Router) {
     this.clinicForm = this.fb.group({
       name: ['', Validators.required],
       address: ['', Validators.required]
@@ -52,6 +55,11 @@ export class LabComponent {
       password: ['', [Validators.required, Validators.minLength(4)]]
     });
   }
+
+  ngOnInit(): void {
+    this.loggedIn = this.auth.isUserLoggedIn;
+  }
+  
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -90,5 +98,9 @@ export class LabComponent {
       console.log('Staff Added:', this.staffForm.value);
       this.staffForm.reset();
     }
+  }
+
+  redirect(path:string){
+    this.router.navigate([path]);
   }
 }

@@ -1,260 +1,529 @@
 <div class="admin container-fluid d-flex">
-    <!-- Toggle Button -->
-    <button class="btn btn-dark toggle-btn" (click)="toggleSidebar()">☰</button>
+  <!-- Toggle Button -->
+  <button class="btn btn-dark toggle-btn" (click)="toggleSidebar()">☰</button>
 
-    <!-- Sidebar -->
-    <div class="side-nav" [class.open]="isSidebarOpen">
-        <h6>Organizer</h6>
-        <ul class="nav flex-column gap-2">
-            <li class="nav-item" [class.active]="show === 'dashboard'" (click)="showContent('dashboard')">
-                <a class="nav-link" ><i class="bi bi-grid"></i>Dashboard</a>
-            </li>
-            <li class="nav-item" [class.active]="show === 'setting'" (click)="showContent('setting')">
-                <a class="nav-link"><i class="bi bi-calendar-event" ></i>Settings</a>
-            </li>
-        </ul>
-        <h6>Doctors</h6>
-        <ul class="nav flex-column gap-2">
-            <li class="nav-item" [class.active]="show === 'doctor'" (click)="showContent('doctor')" *ngFor="let doctor of doctors">
-                <a class="nav-link" ><i class="bi bi-grid"></i>Dr. {{doctor.name}}</a>
-            </li>
-        </ul>
-
-        <h6>Staff</h6>
-        <ul class="nav flex-column gap-2">
-            <li class="nav-item" [class.active]="show === 'staff'" (click)="showContent('staff')" *ngFor="let staff of staff">
-                <a class="nav-link" ><i class="bi bi-grid"></i>{{staff.name}}</a>
-            </li>
-        </ul>
+  <!-- Sidebar -->
+  <div class="side-nav" [class.open]="isSidebarOpen">
+    <div class="profile d-flex align-items-center gap-2">
+      <div class="avatar">
+        <i class="bi bi-person fa-lg mr-3 mb-0"> </i>
+      </div>
+      <div class="details d-flex flex-column">
+        <div class="name">
+           {{userData.role == 'Organizer'?'Organizer':userData.role == 'OrganizerDoctor'?'Organizer Doctor':'Organizer Staff'}}
+        </div>
+        <div class="no">
+          1232329823
+        </div>
+      </div>
     </div>
+    <hr>
+    <ul class="nav flex-column gap-2" *ngIf="userData.role =='Organizer'">
+      <li
+        class="nav-item"
+        [class.active]="show === 'dashboard'"
+        (click)="showContent('dashboard')"
+      >
+        <a class="nav-link"><i class="bi bi-grid"></i>Dashboard</a>
+      </li>
+      <li
+        class="nav-item"
+        [class.active]="show === 'setting'"
+        (click)="showContent('setting')"
+      >
+        <a class="nav-link"><i class="bi bi-calendar-event"></i>Settings</a>
+      </li>
+    </ul>
+    <h6 *ngIf="userData.role =='Organizer'">Doctors</h6>
+    <ul class="nav flex-column gap-2" *ngIf="userData.role =='Organizer'">
+      <li
+        class="nav-item"
+        [class.active]="show === doctor.name"
+        (click)="showContent(doctor.name, doctor)"
+        *ngFor="let doctor of doctors"
+      >
+        <a class="nav-link"><i class="bi bi-grid"></i>Dr. {{ doctor.name }}</a>
+      </li>
+    </ul>
 
-    <!-- Main Content -->
-    <div class="side-content">
-        <div class="container mt-4" *ngIf="show == 'dashboard'">
-                <h3 class="fw-bold">Dashboard Overview</h3>
-              
-                <div class="row mt-3">
-                  <div class="col-md-4 mb-4" *ngFor="let card of dashboardData">
-                    <div class="card custom-card">
-                      <div class="card-body text-center">
-                        <h5 class="fw-semibold">{{ card.title }}</h5>
-                        <h2 class="fw-bold">{{ card.value }}</h2>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+    <h6 *ngIf="userData.role =='Organizer'">Staff</h6>
+    <ul class="nav flex-column gap-2" *ngIf="userData.role =='Organizer'">
+      <li
+        class="nav-item"
+        [class.active]="show === staff.name"
+        (click)="showContent(staff.name, staff)"
+        *ngFor="let staff of staff"
+      >
+        <a class="nav-link"><i class="bi bi-grid"></i>{{ staff.name }}</a>
+      </li>
+    </ul>
+
+    <ul class="nav flex-column gap-2" *ngIf="userData.role =='OrganizerDoctor'">
+      <li
+        class="nav-item active"
+      >
+        <a class="nav-link"><i class="bi bi-grid"></i>Dr. {{ showDoctor.name }}</a>
+      </li>
+    </ul>
+
+    <ul class="nav flex-column gap-2" *ngIf="userData.role =='OrganizerStaff'">
+      <li
+        class="nav-item active"
+      >
+        <a class="nav-link"><i class="bi bi-grid"></i>Dr. {{ showStaff.name }}</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="side-content">
+    <div class="header">
+      <div class="header-main d-flex align-items-center w-100 justify-content-between">
+        <div class="right d-flex gap-3">
+          <div class="d-flex gap-1 align-items-center"><i class="bi bi-house-door fa-lg mr-3 mb-0"> </i> <p class="mb-0">Home</p></div>
+          <div class="d-flex gap-1 align-items-center"><i class="bi bi-printer mb-0"></i> <p class="mb-0">Print</p></div>
+         <div class="d-flex gap-1 align-items-center"> <i class="bi bi-arrow-clockwise mb-0"></i> <p class="mb-0" (click)="refresh()">Refresh</p></div>
         </div>
-        <div class="seeting container mt-4" *ngIf="show == 'setting'">
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center bg-dark text-white p-3 rounded">
-              <h3>Event Camp</h3>
-              <button class="btn btn-light" type="submit" *ngIf="events">Edit Event</button>
-            </div>
-          
-            <!-- Event Form -->
-            <div class="card mt-3 p-3">
-              <h5>Event Details</h5>
-              <form [formGroup]="eventForm">
-                <div class="row">
-                  <div class="col-md-4">
-                    <label>Event Name</label>
-                    <input formControlName="eventName" class="form-control" placeholder="Enter event name" required>
-                  </div>
-                  <div class="col-md-4">
-                    <label>Event Place</label>
-                    <input formControlName="eventPlace" class="form-control" placeholder="Enter event place" required>
-                  </div>
-                  <div class="col-md-4">
-                    <label>Event Date</label>
-                    <input type="date" formControlName="eventDate" class="form-control" required>
-                  </div>
-                </div>
-                <div class="row mt-2">
-                  <div class="col-md-6">
-                    <label>Start Time</label>
-                    <input type="time" formControlName="startTime" class="form-control" required>
-                  </div>
-                  <div class="col-md-6">
-                    <label>End Time</label>
-                    <input type="time" formControlName="endTime" class="form-control" required>
-                  </div>
-                </div>
-                <button class="btn btn-dark mt-3" type="submit" (click)="addEvent()">Save Event</button>
-              </form>
-            </div>
-          
-            <!-- Doctor Form -->
-            <div class="card mt-3 p-3">
-              <h5>Doctor Details</h5>
-              <form [formGroup]="doctorForm">
-                <div class="row">
-                  <div class="col-md-3">
-                    <label>Doctor Name</label>
-                    <input formControlName="name" class="form-control" placeholder="Enter doctor name" required>
-                  </div>
-                  <div class="col-md-3">
-                    <label>Address</label>
-                    <input formControlName="address" class="form-control" placeholder="Enter address" required>
-                  </div>
-                  <div class="col-md-3">
-                    <label>Mobile No</label>
-                    <input formControlName="mobile" class="form-control" placeholder="Enter mobile no" [class.is-invalid]="doctorForm.get('mobile')?.invalid && doctorForm.get('mobile')?.touched" required>
-                    <div class="invalid-feedback" *ngIf="doctorForm.get('mobile')?.invalid && doctorForm.get('mobile')?.touched">
-                        Enter a valid 10-digit mobile number.
-                    </div>
-                </div>
-                  <div class="col-md-3">
-                    <label>Password</label>
-                    <input type="password" formControlName="pass" class="form-control" placeholder="Enter password" required>
-                  </div>
-                </div>
-                <button class="btn btn-dark mt-3" type="submit" (click)="addDoctor()">Add Doctor</button>
-              </form>
-            </div>
-          
-            <!-- Staff Form -->
-            <div class="card mt-3 p-3">
-              <h5>Staff Details</h5>
-              <form [formGroup]="staffForm">
-                <div class="row">
-                  <div class="col-md-3">
-                    <label>Staff Name</label>
-                    <input formControlName="name" class="form-control" placeholder="Enter staff name" required>
-                  </div>
-                  <div class="col-md-3">
-                    <label>Address</label>
-                    <input formControlName="address" class="form-control" placeholder="Enter address" required>
-                  </div>
-                  <div class="col-md-3">
-                    <label>Mobile No</label>
-                    <input formControlName="mobile" class="form-control" placeholder="Enter mobile no" [class.is-invalid]="staffForm.get('mobile')?.invalid && staffForm.get('mobile')?.touched" required>
-                    <div class="invalid-feedback" *ngIf="staffForm.get('mobile')?.invalid && staffForm.get('mobile')?.touched">
-                        Enter a valid 10-digit mobile number.
-                    </div>
-                </div>
-                  <div class="col-md-3">
-                    <label>Password</label>
-                    <input type="password" formControlName="pass" class="form-control" placeholder="Enter password" required>
-                  </div>
-                </div>
-                <button class="btn btn-dark mt-3" type="submit" (click)="addStaff()">Add Staff</button>
-              </form>
-            </div>
-          
-            <!-- Table to Show Data -->
-            <div class="mt-4" *ngIf="events">
-              <h5>Event Details Table</h5>
-              <table class="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Type</th>
-                    <th>Name</th>
-                    <th>Place/Address</th>
-                    <th>Date/Mobile</th>
-                    <th>Start Time/Pass</th>
-                    <th>End Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Event</td>
-                    <td>{{ events.eventName }}</td>
-                    <td>{{ events.eventPlace }}</td>
-                    <td>{{ events.eventDate }}</td>
-                    <td>{{ events.startTime }}</td>
-                    <td>{{ events.endTime }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-              <!-- Doctor Table -->
-              <div class="mt-4" *ngIf="doctors.length > 0">
-                <h5>Doctor List</h5>
-                <table class="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th>Doctor Name</th>
-                      <th>Mobile No</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let doctor of doctors; let i = index">
-                      <td>{{ doctor.name }}</td>
-                      <td>{{ doctor.mobile }}</td>
-                      <td>
-                        <button class="btn btn-danger btn-sm" (click)="deleteDoctor(i)"><i class="bi bi-trash"></i> </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              
-              <div class="mt-4" *ngIf="staff.length > 0">
-                <h5>Staff List</h5>
-                <table class="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th>Staff Name</th>
-                      <th>Mobile No</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let staff of staff; let i = index">
-                      <td>{{ staff.name }}</td>
-                      <td>{{ staff.mobile }}</td>
-                      <td>
-                        <button class="btn btn-danger btn-sm" (click)="deleteStaff(i)"><i class="bi bi-trash"></i></button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+        <div class="left d-flex">
+          <p
+            class="d-flex justify-content-center align-items-center mb-0 p-2"
+            (click)="redirect('login')"
+          >
+            <i class="bi bi-box-arrow-in-right fa-lg mb-0 px-1"></i
+            >{{ loggedIn ? "Logout" : "Login" }}
+          </p>
+          <p
+            class="d-flex justify-content-center align-items-center mb-0 p-2"
+            (click)="redirect('register')"
+            *ngIf="!loggedIn"
+          >
+            <i class="bi bi-person-check fa-lg mb-0 px-1"></i>Register
+          </p>
         </div>
-        <div class="patient-list container mt-4" *ngIf="show == 'doctor'">
-            <h4 class="mb-3">Patient List</h4>
-            
-            <table class="table table-bordered text-center">
-              <thead class="table-dark">
+      </div>
+    </div>
+    <div class="main-con">
+      <div class="container mt-4" *ngIf="show == 'dashboard'">
+        <h4 class="fw-bold">Dashboard</h4>
+  
+        <div class="row mt-3">
+          <div class="col-md-3 mb-4" *ngFor="let card of dashboardData">
+            <div class="card custom-card">
+              <div class="card-body text-center">
+                <h5 class="fw-semibold">{{ card.title }}</h5>
+                <h2 class="fw-bold">{{ card.value }}</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="seeting container mt-4" *ngIf="show == 'setting'">
+        <!-- Header -->
+
+        <h4 class="fw-bold">Settings</h4>
+
+        <div class="btn-row d-flex gap-1 justify-content-between align-items-center px-1 py-1">
+          <button 
+            type="button" 
+            class="btn position-relative"
+            [class.activeBtn]="btn.key === activeButton"
+            *ngFor="let btn of buttons" 
+            (click)="toggleActiveButton(btn.key)">
+            {{ btn.name }}
+          </button>
+        </div>
+
+  
+        <!-- Event Form -->
+        <div class="card mt-3 p-3" *ngIf="activeButton == 'camp'">
+          <h4 class="fw-bold py-2">Add Event</h4>
+          <form [formGroup]="eventForm">
+            <div class="row">
+              <div class="col-md-4">
+                <label>Event Name</label>
+                <input
+                  formControlName="eventName"
+                  class="form-control"
+                  placeholder="Enter event name"
+                  required
+                />
+              </div>
+              <div class="col-md-4">
+                <label>Event Place</label>
+                <input
+                  formControlName="eventPlace"
+                  class="form-control"
+                  placeholder="Enter event place"
+                  required
+                />
+              </div>
+              <div class="col-md-4">
+                <label>Event Date</label>
+                <input
+                  type="date"
+                  formControlName="eventDate"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-6">
+                <label>Start Time</label>
+                <input
+                  type="time"
+                  formControlName="startTime"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label>End Time</label>
+                <input
+                  type="time"
+                  formControlName="endTime"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+            <button class="btn btn-dark mt-3" type="submit" (click)="updateEvent()" *ngIf="events">
+              Update Event
+            </button>
+            <button class="btn btn-dark mt-3" type="submit" (click)="addEvent()" *ngIf="!events">
+              Save Event
+            </button>
+          </form>
+                  <!-- Table to Show Data -->
+        <div class="mt-4 scroll-table" *ngIf="events">
+          <h4>Event Details Table</h4>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Place/Address</th>
+                <th>Date/Mobile</th>
+                <th>Start Time/Pass</th>
+                <th>End Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Event</td>
+                <td>{{ events.eventName }}</td>
+                <td>{{ events.eventPlace }}</td>
+                <td>{{ events.eventDate | date:'dd MM YYYY' }}</td>
+                <td>{{ events.startTime }}</td>
+                <td>{{ events.endTime }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        </div>
+  
+        <!-- Doctor Form -->
+        <div class="card mt-3 p-3" *ngIf="activeButton == 'doctors'">
+          <h4 class="fw-bold py-2">Add Doctors</h4>
+          <form [formGroup]="doctorForm">
+            <div class="row">
+              <div class="col-md-3">
+                <label>Doctor Name</label>
+                <input
+                  formControlName="name"
+                  class="form-control"
+                  placeholder="Enter doctor name"
+                  required
+                />
+              </div>
+              <div class="col-md-3">
+                <label>Address</label>
+                <input
+                  formControlName="address"
+                  class="form-control"
+                  placeholder="Enter address"
+                  required
+                />
+              </div>
+              <div class="col-md-3">
+                <label>Mobile No</label>
+                <input
+                  formControlName="mobile"
+                  class="form-control"
+                  placeholder="Enter mobile no"
+                  [class.is-invalid]="
+                    doctorForm.get('mobile')?.invalid &&
+                    doctorForm.get('mobile')?.touched
+                  "
+                  required
+                />
+                <div
+                  class="invalid-feedback"
+                  *ngIf="
+                    doctorForm.get('mobile')?.invalid &&
+                    doctorForm.get('mobile')?.touched
+                  "
+                >
+                  Enter a valid 10-digit mobile number.
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label>Password</label>
+                <input
+                  type="password"
+                  formControlName="password"
+                  class="form-control"
+                  placeholder="Enter password"
+                  required
+                />
+              </div>
+            </div>
+            <button class="btn btn-dark mt-3" type="submit" (click)="addDoctor()" *ngIf="!isEditDoctor">
+              Add Doctor
+            </button>
+            <button class="btn btn-dark mt-3" type="submit" (click)="editDoctor()" *ngIf="isEditDoctor">
+              Edit Doctor
+            </button>
+            <button class="btn btn-dark mt-3 mx-3" type="submit" (click)="resetDoctor()" *ngIf="isEditDoctor">
+              Reset Doctor
+            </button>
+          </form>
+                  <!-- Doctor Table -->
+        <div class="mt-4" *ngIf="doctors.length > 0">
+          <h5>Doctor List</h5>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Doctor Name</th>
+                <th>Mobile No</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let doctor of doctors; let i = index">
+                <td>{{ doctor.name }}</td>
+                <td>{{ doctor.mobile }}</td>
+                <td>
+                  <div class="d-flex justify-content-center align-items-center gap-3">
+                    <button class="btn btn-danger btn-sm" (click)="deleteDoctor(doctor)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="editDoctorValue(doctor)">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        </div>
+  
+        <!-- Staff Form -->
+        <div class="card mt-3 p-3" *ngIf="activeButton == 'staff'">
+          <h5 class="fw-bold py-2">Add Staff</h5>
+          <form [formGroup]="staffForm">
+            <div class="row">
+              <div class="col-md-3">
+                <label>Staff Name</label>
+                <input
+                  formControlName="name"
+                  class="form-control"
+                  placeholder="Enter staff name"
+                  required
+                />
+              </div>
+              <div class="col-md-3">
+                <label>Address</label>
+                <input
+                  formControlName="address"
+                  class="form-control"
+                  placeholder="Enter address"
+                  required
+                />
+              </div>
+              <div class="col-md-3">
+                <label>Mobile No</label>
+                <input
+                  formControlName="mobile"
+                  class="form-control"
+                  placeholder="Enter mobile no"
+                  [class.is-invalid]="
+                    staffForm.get('mobile')?.invalid &&
+                    staffForm.get('mobile')?.touched
+                  "
+                  required
+                />
+                <div
+                  class="invalid-feedback"
+                  *ngIf="
+                    staffForm.get('mobile')?.invalid &&
+                    staffForm.get('mobile')?.touched
+                  "
+                >
+                  Enter a valid 10-digit mobile number.
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label>Password</label>
+                <input
+                  type="password"
+                  formControlName="password"
+                  class="form-control"
+                  placeholder="Enter password"
+                  required
+                />
+              </div>
+            </div>
+            <button class="btn btn-dark mt-3" type="submit" (click)="addStaff()" *ngIf="!isEditstaff">
+              Add Staff
+            </button>
+            <button class="btn btn-dark mt-3" type="submit" (click)="editStaff()" *ngIf="isEditstaff">
+              Edit Staff
+            </button>
+            <button class="btn btn-dark mt-3 mx-3" type="submit" (click)="resetStaff()" *ngIf="isEditstaff">
+              Reset Staff
+            </button>
+          </form>
+          <div class="mt-4" *ngIf="staff.length > 0">
+            <h5>Staff List</h5>
+            <table class="table table-bordered">
+              <thead>
                 <tr>
-                  <th>S. No.</th>
-                  <th>Patient Name</th>
-                  <th>M/F</th>
-                  <th>Email</th>
-                  <th>Mobile No.</th>
-                  <th>Status</th>
+                  <th>Staff Name</th>
+                  <th>Mobile No</th>
                   <th>Action</th>
                 </tr>
               </thead>
-              
               <tbody>
-                <tr *ngFor="let patient of patients; let i = index">
-                  <td>{{ i + 1 }}</td>
-                  <td>{{ patient.name }}</td>
-                  <td>{{ patient.gender }}</td>
-                  <td>{{ patient.email }}</td>
-                  <td>{{ patient.mobile }}</td>
-          
-                  <!-- Status Toggle -->
+                <tr *ngFor="let staff of staff; let i = index">
+                  <td>{{ staff.name }}</td>
+                  <td>{{ staff.mobile }}</td>
                   <td>
-                    <button class="btn" 
-                            [ngClass]="{'btn-warning': patient.status === 'Pending', 'btn-success': patient.status === 'Complete'}" 
-                            (click)="toggleStatus(i)">
-                      {{ patient.status }}
-                    </button>
-                  </td>
-          
-                  <!-- Cancel Button -->
-                  <td>
-                    <button class="btn btn-danger btn-sm" (click)="removePatient(i)">
-                      <i class="bi bi-trash"></i> Cancel
-                    </button>
+                    <div class="d-flex justify-content-center align-items-center gap-3">
+                      <button class="btn btn-danger btn-sm" (click)="deleteStaff(staff)">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                      <button class="btn btn-danger btn-sm" (click)="editStaffValue(staff)">
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
             </table>
+          </div>
         </div>
+      </div>
+      <div class="patient-list container mt-4" *ngIf="show == showDoctor?.name">
+        <h4 class="mb-3">Patient List</h4>
+  
+        <table class="table table-bordered text-center">
+          <thead class="table-dark">
+            <tr>
+              <th>S. No.</th>
+              <th>Patient Name</th>
+              <th>M/F</th>
+              <th>Email</th>
+              <th>Mobile No.</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+  
+          <tbody *ngIf="showDoctor?.patient">
+            <tr *ngFor="let patient of showDoctor?.patient; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ patient.name }}</td>
+              <td>{{ patient.gender }}</td>
+              <td>{{ patient.email }}</td>
+              <td>{{ patient.mobile }}</td>
+  
+              <!-- Status Toggle -->
+              <td>
+                <button
+                  class="btn"
+                  [ngClass]="{
+                    'btn-warning': patient.status === 'Pending',
+                    'btn-success': patient.status === 'Complete'
+                  }"
+                  (click)="toggleStatus(i)"
+                >
+                  {{ patient.status }}
+                </button>
+              </td>
+  
+              <!-- Cancel Button -->
+              <td>
+                <button class="btn btn-danger btn-sm" (click)="removePatient(i)">
+                  <i class="bi bi-trash"></i> Cancel
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="!showDoctor?.patient">
+            <tr><td colspan="7" style="text-align: center;">
+              <h4>No Patient Details Present</h4>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="patient-list container mt-4" *ngIf="show == showStaff?.name">
+        <h4 class="mb-3">Patient List</h4>
+  
+        <table class="table table-bordered text-center">
+          <thead class="table-dark">
+            <tr>
+              <th>S. No.</th>
+              <th>Patient Name</th>
+              <th>M/F</th>
+              <th>Email</th>
+              <th>Mobile No.</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+  
+          <tbody *ngIf="patients.length > 0">
+            <tr *ngFor="let patient of patients; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ patient.name }}</td>
+              <td>{{ patient.gender }}</td>
+              <td>{{ patient.email }}</td>
+              <td>{{ patient.mobile }}</td>
+  
+              <!-- Status Toggle -->
+              <td>
+                <button
+                  class="btn"
+                  [ngClass]="{
+                    'btn-warning': patient.status === 'Pending',
+                    'btn-success': patient.status === 'Complete'
+                  }"
+                  (click)="toggleStatus(i)"
+                >
+                  {{ patient.status }}
+                </button>
+              </td>
+  
+              <!-- Cancel Button -->
+              <td>
+                <button class="btn btn-danger btn-sm" (click)="removePatient(i)">
+                  <i class="bi bi-trash"></i> Cancel
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="!showDoctor?.patient">
+            <tr><td colspan="7" style="text-align: center;">
+              <h4>No Patient Details Present</h4>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    
+  </div>
 </div>
+
+<app-loader *ngIf="loader" [isLoading]="true"></app-loader>

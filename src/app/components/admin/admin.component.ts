@@ -153,12 +153,12 @@ export class AdminComponent implements OnInit {
           doctors: this.doctors // Append new doctor
         }
       };
-      this.rest.addEventDoctor(data).subscribe((res:any)=>{
-        this.existData = res.data;
-        this.doctors = res.data.doctors;
-        this.showStaffForm = true;
-        this.doctorForm.reset();
-      })
+      // this.rest.addEventDoctor(data).subscribe((res:any)=>{
+      //   this.existData = res.data;
+      //   this.doctors = res.data.doctors;
+      //   this.showStaffForm = true;
+      //   this.doctorForm.reset();
+      // })
     }
   }
 
@@ -171,11 +171,11 @@ export class AdminComponent implements OnInit {
           staff: this.staff // Append new doctor
         }
       };
-      this.rest.addEventStaff(data).subscribe((res:any)=>{
-        this.existData = res.data;
-        this.staff = this.existData.staff;
-        this.staffForm.reset();
-      })
+      // this.rest.addEventStaff(data).subscribe((res:any)=>{
+      //   this.existData = res.data;
+      //   this.staff = this.existData.staff;
+      //   this.staffForm.reset();
+      // })
     }
   }
 

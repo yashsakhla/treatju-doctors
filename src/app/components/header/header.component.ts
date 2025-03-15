@@ -29,8 +29,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
   private popoverInstance: bootstrap.Popover | null = null;
   loggedIn:boolean = false;
 
-  @Input() showSearch!: boolean;
-
   selectedCityFromDropdown: string = ''; // Store city from dropdown
 
   constructor(
@@ -111,6 +109,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
   }
 
   handleCitySelection(city: string) {
+    console.log(city)
     this.selectedCityFromDropdown = city;
     this.rest.checkCityEvent(this.selectedCityFromDropdown);
   }

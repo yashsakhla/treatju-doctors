@@ -1,10 +1,37 @@
 /* Sidebar Styling */
+/* Sidebar Styling */
+.header{
+    background-color: #facc15;
+    padding: 0.8rem 1rem;
+    .right, .left{
+        p{
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+    }
+}
+
+.avatar{
+    background-color: #9d9d9d39;
+    border-radius: 50%;
+    padding: 0.5rem 0.8rem;
+}
+
+.details{
+    .name{
+        font-size: 1rem;
+    }
+    .no{
+        font-size: 0.7rem;
+    }
+}
 .admin{
     position: relative;
     padding-left: 0;
     padding-top: 2px;
 }
 .side-nav {
+    height: 100% !important;
     width: 0;
     background: #fff;
     color: black;
@@ -14,6 +41,7 @@
     left: 0;
     transition: width 0.3s ease-in-out;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    height: 100vh;
 }
 
 /* When sidebar is open */
@@ -44,8 +72,8 @@
 
 /* Main Content */
 .side-content {
-    padding: 20px;
     width: 100%;
+    background-color: #f9fafb;
 }
 
 .table-container {
@@ -107,4 +135,40 @@ h6{
   .row {
     justify-content: center; /* Centers the cards */
   }
+
+  .btn-row{
+    background-color: #f1f5f9;
+    border-radius: 10px;
+    button{
+      width: 23%;
+      min-width: fit-content;
+      color: #64748b;
+    }
+  }
+
+  .scroll-table{
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+
+  .activebutton{
+    background-color: #fff;
+    color: #000;
+  }
+
+  th{
+    white-space: nowrap;
+  }
   
+  @media (max-width: 768px) {
+    .header-main{
+        flex-direction: column;
+    }
+
+    .open{
+        position: absolute;
+        padding-left: 3rem !important;
+        z-index: 1;
+        height: 100%;
+    }
+  }

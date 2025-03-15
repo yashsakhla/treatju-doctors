@@ -5,11 +5,13 @@ import { Router } from '@angular/router';
 import { CityDropdownComponent } from '../city-dropdown/city-dropdown.component';
 import { HttpClient } from '@angular/common/http';
 import { RestService } from '../../core/rest/rest.service';
+import { LoaderComponent } from '../loader/loader.component';
+import { TosterService } from '../../core/toster/toster.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule,FormsModule, CityDropdownComponent, ReactiveFormsModule],
+  imports: [CommonModule,FormsModule, CityDropdownComponent, ReactiveFormsModule, LoaderComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
@@ -18,10 +20,10 @@ export class RegisterComponent {
   private router = inject(Router);
 
   selectedRole: string = 'Patient';
-  roles = ['Patient', 'Organizer', 'Doctor', 'Lab','Hospital'];
+  roles = ['Patient', 'Organizer', 'VisitDoctor', 'Lab','Hospital'];
 
   userName: string = '';
-  age: number | null = null;
+  age!: number;
   city: string = '';
   address: string = '';
   mobile: string = '';
@@ -29,8 +31,10 @@ export class RegisterComponent {
   password: string = '';
   confirmPassword: string = '';
   cityTouched!: boolean;
+  id:string = '';
+  loader!:boolean;
 
-  constructor(private rest:RestService){
+  constructor(private rest:RestService, private toster:TosterService){
 
   }
 
@@ -38,8 +42,6 @@ export class RegisterComponent {
     if (this.selectedRole === 'Patient') {
       this.city = '';
       this.address = '';
-    } else {
-      this.age = null;
     }
     this.userName = '';
     this.mobile = '';
@@ -63,7 +65,7 @@ export class RegisterComponent {
   }
 
   isFormInvalid(): boolean {
-    if (!this.userName || this.mobile.length !== 10 || this.password.length !== 4 || this.password !== this.confirmPassword) {
+    if (!this.userName || this.mobile.length !== 10 || this.password.length !== 6 || this.password !== this.confirmPassword) {
       return true;
     }
     if (this.selectedRole !== 'Patient' && !this.city) {
@@ -77,33 +79,36 @@ export class RegisterComponent {
       alert('Please fill all required fields correctly.');
       return;
     }
-    const userData = {
-      userName: this.userName,
-      age: this.age,
-      city: this.city,
-      address: this.address,
-      mobile: this.mobile,
-      email: this.email,
+    this.loader = true
+    const userData = this.selectedRole == 'Patient' ? {
+      username: this.userName,
+      email:this.email,
+      age:this.age,
+      mobile: Number(this.mobile),
       password: this.password,
       role:this.selectedRole,
-      data:this.selectedRole == "Organizer"?{
-        eventDetails:[],
-        doctors:[],
-        staff:[]
-      }:this.selectedRole == "Doctor" ? {
-        visitDetails:[],
-        staff:[]
-      }:this.selectedRole == "Lab"? {
-        labDetails:[]
-      }:this.selectedRole == "Hospital" ? {
-        hospitalDetails:[]
-      }:{
-
-      }
+      gender:'Male',
+    } : {
+      username: this.userName,
+      email:this.email,
+      city: this.city,
+      address: this.address,
+      mobile: Number(this.mobile),
+      password: this.password,
+      role:this.selectedRole,
+      workId:this.id
     }
     
-    this.rest.registerUser(userData).subscribe((res:any)=>{
-      this.router.navigate(['login']);
+    this.rest.registerUser(userData).subscribe({
+      next:(res:any)=>{
+        this.loader = false;
+        this.toster.showSuccess("You have registered Successfully, Pleae Login now!","Registeration Done")
+        this.router.navigate(['login']);
+      },
+      error:(err:Error)=>{
+        this.loader = false;
+        this.toster.showError("Regisetration has failed, Please contact admin","Registeration Failed!")
+      }
     })
   }
 

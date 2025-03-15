@@ -10,12 +10,15 @@ import {
 } from '@angular/forms';
 import { EventFormComponentComponent } from '../event-form-component/event-form-component.component';
 import { RestService } from '../../core/rest/rest.service';
+import { AuthService } from '../../core/auth/auth.service';
+import { Router } from '@angular/router';
+import { TosterService } from '../../core/toster/toster.service';
 
 interface Staff {
   name: string;
   address: string;
   mobile: string;
-  pass: string;
+  password: string;
 }
 
 @Component({
@@ -38,31 +41,38 @@ export class VisitDoctorComponent {
   
     showDoctorForm = false;
     showStaffForm = false;
-    existData:any;
+    loggedIn!:boolean;
   
-    totalPatients = 50; // Example number of total patients
-    completedPatients = 30; // Example completed patients count
-    feePerPatient = 500; // Example fee per completed patient
-    adminRevenuePercentage = 0.2; // 20% Admin Revenue
+
+    buttons:any[]=[
+      {
+        name:"Doctors",
+        active:false,
+        notification:0,
+        key:"doctors"
+      },
+      {
+        name:"Staff",
+        active:false,
+        notification:0,
+        key:"staff"
+      },
+    ]
   
     dashboardData = [
-      { title: 'Total Staff', value: 10 },
-      { title: 'Total Bookings', value: this.totalPatients },
-      { title: 'Pending Bookings', value: this.totalPatients - this.completedPatients },
-      { title: 'Completed Bookings', value: this.completedPatients },
-      { title: 'Cancelled Bookings', value: 5 },
-      { title: 'Fee Collection', value: `₹${this.completedPatients * this.feePerPatient}` },
+      { title: 'Total Staff', value: 0 },
+      { title: 'Total Bookings', value: 0 },
+      { title: 'Pending Bookings', value: 0},
+      { title: 'Completed Bookings', value:0},
+      { title: 'Cancelled Bookings', value: 0 },
+      { title: 'Fee Collection', value: `₹${0}` },
       { 
         title: 'Admin Revenue (20%)', 
-        value: `₹${(this.completedPatients * this.feePerPatient * this.adminRevenuePercentage).toFixed(2)}` 
+        value: `₹${(0).toFixed(2)}` 
       }
     ];
   
-    patients = [
-      { name: 'Rahul Sharma', gender: 'M', email: 'rahul@example.com', mobile: '9876543210', status: 'Pending' },
-      { name: 'Priya Verma', gender: 'F', email: 'priya@example.com', mobile: '9123456789', status: 'Pending' },
-      { name: 'Amit Kumar', gender: 'M', email: 'amit@example.com', mobile: '9012345678', status: 'Complete' }
-    ];
+    patients:any[] = []
     
     visitDoctorForm!: FormGroup;
     availableDates = [
@@ -70,42 +80,105 @@ export class VisitDoctorComponent {
       { date: '2025-03-15' },
       { date: '2025-03-20' }
     ];
-    
+  userData: any;
+  activeButton: string='doctors';
+  showStaff: any;
+  loader!: boolean;
+  visitDetails:any;
+  isEditstaff: any;
   
-    constructor(private rest: RestService, private fb: FormBuilder) {
+    constructor(private rest: RestService, private fb: FormBuilder, private auth :AuthService, private router:Router, private toster:TosterService) {
       this.visitDoctorForm = this.fb.group({
-        visitCampPlace: ['', Validators.required],
-        visitDate: ['', Validators.required],  // ✅ Single Date Field
-        timeFrom: ['', Validators.required],
-        timeTo: ['', Validators.required],
-        patientFee: ['', [Validators.required, Validators.min(1)]]
+        visitName:['Dummy Visit'],
+        visitPlace: ['', Validators.required],
+        eventDate: ['', Validators.required],  // ✅ Single Date Field
+        startTime: ['', Validators.required],
+        endTime: ['', Validators.required],
+        doctorFee: ['', [Validators.required]]
       });
 
       this.staffForm = this.fb.group({
         name: ['', Validators.required],
         address: ['', Validators.required],
         mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-        pass: ['', Validators.required],
+        password: ['', Validators.required],
       });
     }
   
     ngOnInit(): void {
-      this.existData=this.rest.userData?.data;
-      this.visitDoctor = this.rest.userData?.data.visitDetails[0];
-      if(this.visitDoctor){
-        this.patchValue(this.visitDoctor);
-        this.staff = this.existData.staff ? this.existData.staff : [];
+      this.loggedIn = this.auth.isUserLoggedIn;
+      this.userData = this.rest.userData;
+      this.visitDoctor = this.userData;
+      if(this.userData.role == 'VisitDoctor'){
+        this.show = 'dashboard'
+        this.getDetails();
+      }else if(this.userData.role == 'VisitDoctorStaff'){
+        this.showStaff = this.userData.staff;
       }
+    }
+
+    getDetails(){
+      this.rest.getVisitDoctorDetails().subscribe(
+        {
+          next:(res:any)=>{
+            this.visitDetails = res[0];
+            this.patchValue(this.visitDetails);
+            this.patients = this.visitDetails.patients;
+            this.staff = this.visitDetails.staff;
+            this.updateDashboardData(this.staff);
+          }
+        }
+      ) 
+    }
+
+
+    updateDashboardData(staff:Staff[]) {
+
+      // Flatten all patient arrays from doctors into one array
+      this.patients = this.visitDoctor.patient;
+    
+      // Update dashboard data
+      this.dashboardData = this.dashboardData.map((item) => {
+       if (item.title === 'Total Bookings') {
+          return { ...item, value: this.patients.length }; // Assuming patients represent bookings
+        } else if(item.title === 'Total Staff'){
+          return { ...item, value: staff.length };
+        }else if(item.title === 'Pending Bookings'){
+          return { ...item, value: this.patients.filter(p => p.status === 'Pending').length };
+        }
+        else if(item.title === 'Completed Bookings'){
+          return { ...item, value: this.patients.filter(p => p.status === 'Completed').length };
+        }
+        else if(item.title === 'Cancel Bookings'){
+          return { ...item, value: this.patients.filter(p => p.status === 'Cancel').length };
+        }else if(item.title === 'Admin Revenue (20%)'){
+          return { ...item, value: this.patients.filter(p => p.status === 'Completed').length * this.visitDoctor.fee * 0.2 };
+        }
+        return item;
+      });
+    }
+
+    toggleActiveButton(selectedKey: string) {
+      this.activeButton = selectedKey;
+      this.buttons.forEach(button => {
+        button.active = button.key === selectedKey;
+      });
     }
   
     patchValue(events:any){
       this.visitDoctorForm = this.fb.group({
-        visitCampPlace: [events.visitCampPlace, Validators.required],
-        visitDate: [events.visitDate, Validators.required],  // ✅ Single Date Field
-        timeFrom: [events.timeFrom, Validators.required],
-        timeTo: [events.timeTo, Validators.required],
-        patientFee: [events.patientFee, [Validators.required, Validators.min(1)]]
+        visitPlace: [events.visitPlace, Validators.required],
+        eventDate: [new Date(events.eventDate).toISOString().split('T')[0], Validators.required],  // ✅ Single Date Field
+        startTime: [this.isoToTimeString(events.startTime), Validators.required],
+        endTime: [this.isoToTimeString(events.endTime), Validators.required],
+        doctorFee: [events.patientFee, [Validators.required, Validators.min(1)]]
       });
+    }
+
+    isoToTimeString(isoString: string): string {
+      if (!isoString) return '';
+      const date = new Date(isoString);
+      return date.toISOString().substring(11, 16); // Extract HH:mm
     }
   
     toggleSidebar() {
@@ -116,30 +189,47 @@ export class VisitDoctorComponent {
       this.show = path;
     }
   
-    addDoctor() {
-      console.log(this.doctorForm);
-    }
-  
     addStaff() {
-      if (this.staffForm.valid) {
-        this.staff.push(this.staffForm.value);
-        const data = {
-          data: {
-            ...this.existData,
-            staff: this.staff // Append new doctor
+      const data = this.staffForm.value;
+      data.role = "VisitDoctorStaff";
+      this.rest.addVisitDocStaff(data,this.visitDetails).subscribe(
+        {
+          next:()=>{
+            this.getDetails();
+          },
+          error:()=>{
+
           }
-        };
-        this.rest.addEventStaff(data).subscribe((res:any)=>{
-          this.existData = res.data;
-          this.staff = this.existData.staff;
-          this.staffForm.reset();
-        })
-      }
+        }
+        
+      )
     }
   
-  
-    deleteStaff(index: number) {
-      this.staff.splice(index, 1);
+    deleteStaff(staff:any) {
+      this.rest.deleteVisitStaff(this.visitDetails._id,staff._id).subscribe(
+        {
+          next:(res:any)=>{
+
+          },
+          error:()=>{
+
+          }
+        }
+      )
+    }
+
+    updateVisit(){
+      const data = this.visitDoctorForm.value;
+      this.rest.updateVisitDoctor(this.visitDetails._id,data).subscribe(
+        {
+          next:(res:any)=>{
+
+          },
+          error:()=>{
+
+          }
+        }
+      )
     }
   
     // Toggle Status (Pending <-> Complete)
@@ -149,24 +239,67 @@ export class VisitDoctorComponent {
   
     // Remove Patient from List
     removePatient(index: number) {
-      this.patients.splice(index, 1);
+      
+    }
+
+    editStaffValue(staff:any){
+      this.isEditstaff = staff;
+      this.staffForm = this.fb.group({
+      name: [staff.name, Validators.required],
+      address: [staff.address, Validators.required],
+      mobile: [staff.mobile, [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      password: [staff.password, Validators.required],
+    });
+    }
+
+    updateStaff(){
+      this.isEditstaff = null;
+      const data = this.staffForm.value;
+      this.rest.updateVisitDocStaff(this.visitDetails._id, this.isEditstaff._id,data).subscribe(
+        {
+          next:(res:any)=>{
+
+          },
+          error:()=>{
+
+          }
+        }
+      )
+    }
+
+    deleteVisit(){
+      this.rest.deleteVisitDoc(this.visitDetails._id).subscribe(
+        {
+          next:(res:any)=>{
+
+          },
+          error:()=>{
+
+          }
+        }
+      )
+    }
+
+    resetStaff(){
+      this.staffForm.reset();
+      this.isEditstaff = null;
     }
 
     onSubmit() {
       if (this.visitDoctorForm.valid) {
-        const data =  {
-          data: {
-            ...this.existData,
-            visitDetails: [this.visitDoctorForm.value]
-          }
-        };
+        this.visitDoctorForm.get('startTime')?.setValue(`${this.visitDoctorForm.value.eventDate}T${this.visitDoctorForm.value.startTime}:00.000Z`);
+        this.visitDoctorForm.get('endTime')?.setValue(`${this.visitDoctorForm.value.eventDate}T${this.visitDoctorForm.value.endTime}:00.000Z`);
+        this.visitDoctorForm.get('eventDate')?.setValue(new Date(this.visitDoctorForm.value.eventDate).toISOString());
+        const data = this.visitDoctorForm.value;
         this.rest.addVisitDoctor(data).subscribe((res:any)=>{
-          this.existData = res.data;
-          this.visitDoctor = this.existData.visitDetails[0];
-          this.patchValue(this.visitDoctor);
+          this.getDetails()
         });
       } else {
         alert('Please fill in all required fields!');
       }
     }
+    
+  redirect(path:string){
+    this.router.navigate([path]);
+  }
 }

@@ -14,7 +14,8 @@ import { FooterComponent } from './components/footer/footer.component';
 })
 export class AppComponent implements OnInit{
   title = 'treatju-doctors';
-  show!:boolean;
+  showHeader!:boolean;
+  showFooter!:boolean;
   search: any;
 
   constructor(private aRouter:Router){
@@ -24,16 +25,12 @@ export class AppComponent implements OnInit{
     this.aRouter.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
-      if(event.url === "/login" || event.url === "/register"){
-        this.show = false;
+      if(event.url === "/user" || event.url == '/'){
+        this.showHeader = true;
+        this.showFooter = true;
       }else{
-        console.log(event.url)
-        if(event.url == "/user" || event.url == "/"){
-          this.search = true;
-        }else{
-          this.search = false;
-        }
-        this.show = true;
+        this.showHeader = false;
+        this.showFooter = false;
       }
     });
   }

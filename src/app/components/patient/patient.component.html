@@ -33,25 +33,27 @@
                     <tr *ngFor="let doc of data.doctors">
                       <!-- Date & Time Column -->
                       <td class="text-sm py-3 px-2">
-                        <div class="fw-600">{{ data.date | date:'dd-MM-yy' }}</div>
-                        <div class="small text-muted">{{ data.startTime | date:'h a' }} to {{ data.endTime | date:'h a' }}</div>
+
+                        <div class="fw-600">{{ data.eventDate | date:'dd-MM-yy' }}</div>
+                        <div class="small text-muted">{{ getIsoString(data.startTime) | date:'h a' }} to {{ getIsoString(data.endTime) | date:'h a' }}</div>
                       </td>
               
                       <!-- Doctors Column -->
                       <td class="text-sm py-3 px-2 fw-600">
-                        {{doc}}
+                        {{doc.name}}
                       </td>
               
                       <!-- Place Column -->
-                      <td class="text-sm py-3 px-2 fw-600">{{ data.place }}</td>
+                      <td class="text-sm py-3 px-2 fw-600">{{ data.eventPlace }}</td>
               
                       <!-- Booking Column -->
                       <td class="text-sm py-3 px-2 text-right" style="text-align: right;">
                         <button type="button" class="btn btn-dark btn-sm px-3 py-2"
-                          [disabled]="false" 
-                          (click)="bookCamp(data, doc)">
+                          [disabled]="isBtnDisabled(data)" 
+                          (click)="bookCamp(data, doc)" *ngIf="isUserLoggedin">
                           <i class="bi bi-calendar-check"></i> Book Now
                         </button>
+                        <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
                       </td>
                     </tr>
                   </tbody>
@@ -73,29 +75,30 @@
                       <th scope="col" class="text-sm text-muted py-3" style="text-align: right;">Action</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr *ngFor="let data of showContent">
+                  <tbody *ngFor="let data of showContent">
+                    <tr *ngFor="let visit of data.visitDetails">
                       <!-- Date & Time Column -->
                       <td class="text-sm py-3 px-2">
-                        <div class="fw-600">{{ data.date | date:'dd-MM-yy' }}</div>
-                        <div class="small text-muted">{{ data.startTime | date:'h a' }} to {{ data.endTime | date:'h a' }}</div>
+                        <div class="fw-600">{{ visit.eventDate | date:'dd-MM-yy' }}</div>
+                        <div class="small text-muted">{{ getIsoString(visit.startTime) | date:'h a' }} to {{ getIsoString(visit.endTime) | date:'h a' }}</div>
                       </td>
               
                       <!-- Doctors Column -->
                       <td class="text-sm py-3 px-2 fw-600">
-                        {{data.name}}
+                        {{data.username}}
                       </td>
               
                       <!-- Place Column -->
-                      <td class="text-sm py-3 px-2 fw-600">{{ data.place }}</td>
+                      <td class="text-sm py-3 px-2 fw-600">{{ visit.visitPlace }}</td>
               
                       <!-- Booking Column -->
                       <td class="text-sm py-3 px-2 text-right" style="text-align: right;">
                         <button type="button" class="btn btn-dark btn-sm px-3 py-2"
                           [disabled]="false" 
-                          (click)="bookDoctor(data)">
+                          (click)="bookVisit(data, visit)" *ngIf="isUserLoggedin">
                           <i class="bi bi-calendar-check"></i> Book Now
                         </button>
+                        <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
                       </td>
                     </tr>
                   </tbody>
@@ -175,3 +178,6 @@
     </div>
   </div>
 </div>
+
+<app-loader *ngIf="loader" [isLoading]="true"></app-loader>
+
