@@ -33,9 +33,15 @@ export class RegisterComponent {
   cityTouched!: boolean;
   id:string = '';
   loader!:boolean;
+  selectedGender: string | null = null;
+
 
   constructor(private rest:RestService, private toster:TosterService){
 
+  }
+
+  selectGender(gender: string) {
+    this.selectedGender = gender;
   }
 
   onRoleChange() {
@@ -51,6 +57,17 @@ export class RegisterComponent {
     this.address = '';
     this.city = ''
     this.cityTouched = false;
+  }
+
+  getRoleIcon(role: string): string {
+    const icons: Record<string, string>= {
+      Patient: "bi bi-person-fill",
+      Organizer: "bi bi-calendar-event",
+      VisitDoctor: "bi bi-clipboard-heart",
+      Lab: "bi bi-bag-plus-fill",
+      Hospital: "bi bi-hospital"
+    };
+    return icons[role] || "bi bi-question-circle";
   }
 
   validateAge() {
@@ -87,7 +104,7 @@ export class RegisterComponent {
       mobile: Number(this.mobile),
       password: this.password,
       role:this.selectedRole,
-      gender:'Male',
+      gender:this.selectedGender,
     } : {
       username: this.userName,
       email:this.email,

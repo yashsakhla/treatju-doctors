@@ -31,7 +31,6 @@
 }
 
 .side-nav {
-    height: 100% !important;
     width: 0;
     background: #fff;
     color: black;
@@ -48,6 +47,12 @@
 .side-nav.open {
     width: 250px;
     padding: 1rem;
+}
+
+.disabled{
+    opacity: 50%;
+    pointer-events: none;
+    cursor: not-allowed;
 }
 
 /* Sidebar links */

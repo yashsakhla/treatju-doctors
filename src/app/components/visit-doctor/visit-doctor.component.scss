@@ -31,7 +31,6 @@
     padding-top: 2px;
 }
 .side-nav {
-    height: 100% !important;
     width: 0;
     background: #fff;
     color: black;
@@ -42,6 +41,12 @@
     transition: width 0.3s ease-in-out;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     height: 100vh;
+}
+
+.disabled{
+    opacity: 50%;
+    pointer-events: none;
+    cursor: not-allowed;
 }
 
 /* When sidebar is open */

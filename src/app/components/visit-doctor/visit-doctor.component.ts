@@ -13,6 +13,7 @@ import { RestService } from '../../core/rest/rest.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { TosterService } from '../../core/toster/toster.service';
+import { LoaderComponent } from '../loader/loader.component';
 
 interface Staff {
   name: string;
@@ -24,7 +25,7 @@ interface Staff {
 @Component({
   selector: 'app-visit-doctor',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, EventFormComponentComponent],
+  imports: [CommonModule, ReactiveFormsModule, EventFormComponentComponent, LoaderComponent],
   templateUrl: './visit-doctor.component.html',
   styleUrl: './visit-doctor.component.scss'
 })
@@ -113,7 +114,9 @@ export class VisitDoctorComponent {
         this.show = 'dashboard'
         this.getDetails();
       }else if(this.userData.role == 'VisitDoctorStaff'){
-        this.showStaff = this.userData.staff;
+        this.showStaff = this.userData;
+        this.show = this.showStaff.name;
+        this.getAllPatientDetails();
       }
     }
 
@@ -121,22 +124,53 @@ export class VisitDoctorComponent {
       this.rest.getVisitDoctorDetails().subscribe(
         {
           next:(res:any)=>{
-            this.visitDetails = res[0];
+            if(res.length > 0){
+              this.visitDetails = res[0];
             this.patchValue(this.visitDetails);
-            this.patients = this.visitDetails.patients;
             this.staff = this.visitDetails.staff;
+            this.getAllPatientDetails(this.visitDetails._id);
             this.updateDashboardData(this.staff);
+            }else{
+              this.visitDetails = []
+            }
           }
         }
       ) 
     }
+    getAllPatientDetails(visitId?:any){
+      this.loader = true;
+      this.rest.getPatientList(this.visitDoctor._id,visitId).subscribe(
+        {
+          next:(res:any)=>{
+            this.patients = res;
+            this.loader = false;
+          },
+          error:()=>{
+            this.toster.showError("Error Fetching Patinets!","Please contact Admin!!")
+            this.loader = false;
+          }
+        }
+      )
+    }
+
+    getPatients(){
+      this.loader = true;
+      this.rest.getAllPatients().subscribe(
+        {
+          next:(res:any)=>{
+            this.patients = res;
+            this.loader = false;
+          },
+          error:()=>{
+            this.toster.showError("Error Fetching Patinets!","Please contact Admin!!")
+            this.loader = false;
+          }
+        }
+      )
+    }
 
 
     updateDashboardData(staff:Staff[]) {
-
-      // Flatten all patient arrays from doctors into one array
-      this.patients = this.visitDoctor.patient;
-    
       // Update dashboard data
       this.dashboardData = this.dashboardData.map((item) => {
        if (item.title === 'Total Bookings') {
@@ -171,7 +205,7 @@ export class VisitDoctorComponent {
         eventDate: [new Date(events.eventDate).toISOString().split('T')[0], Validators.required],  // ✅ Single Date Field
         startTime: [this.isoToTimeString(events.startTime), Validators.required],
         endTime: [this.isoToTimeString(events.endTime), Validators.required],
-        doctorFee: [events.patientFee, [Validators.required, Validators.min(1)]]
+        doctorFee: [events.doctorFee, [Validators.required, Validators.min(1)]]
       });
     }
 
@@ -185,20 +219,24 @@ export class VisitDoctorComponent {
       this.isSidebarOpen = !this.isSidebarOpen;
     }
   
-    showContent(path: string) {
+    showContent(path: string, staff?:any) {
       this.show = path;
+      if(staff){this.showStaff = staff; this.getAllPatientDetails(this.visitDetails._id);};
     }
   
     addStaff() {
+      this.loader = true;
       const data = this.staffForm.value;
       data.role = "VisitDoctorStaff";
       this.rest.addVisitDocStaff(data,this.visitDetails).subscribe(
         {
           next:()=>{
+            this.toster.showSuccess("You have Successfully Added New Staff to your Visit!","Staff Added!!")
             this.getDetails();
           },
           error:()=>{
-
+            this.loader = false;
+            this.toster.showError("There is error in adding your staff,Please contact admin","Error Adding Staff!")
           }
         }
         
@@ -206,40 +244,72 @@ export class VisitDoctorComponent {
     }
   
     deleteStaff(staff:any) {
-      this.rest.deleteVisitStaff(this.visitDetails._id,staff._id).subscribe(
-        {
-          next:(res:any)=>{
-
-          },
-          error:()=>{
-
+      this.loader = true;
+        this.rest.deleteVisitStaff(this.visitDetails._id, staff._id).subscribe(
+          {
+            next:(res:any)=>{
+              if(res){
+                this.getDetails();
+                this.toster.showSuccess("You have successfully Deleted your Staff!!","Deleted Successfully!")
+              }
+            },
+            error:()=>{
+              this.loader = false;
+              this.toster.showError("There is Error in Deleting this Staff, Please contact admin","Error In Deleting!!")
+            }
           }
-        }
-      )
+        )
     }
 
     updateVisit(){
-      const data = this.visitDoctorForm.value;
-      this.rest.updateVisitDoctor(this.visitDetails._id,data).subscribe(
+      if (this.visitDoctorForm.valid) {
+        this.loader = true;
+        this.visitDoctorForm.get('startTime')?.setValue(`${this.visitDoctorForm.value.eventDate}T${this.visitDoctorForm.value.startTime}:00.000Z`);
+        this.visitDoctorForm.get('endTime')?.setValue(`${this.visitDoctorForm.value.eventDate}T${this.visitDoctorForm.value.endTime}:00.000Z`);
+        this.visitDoctorForm.get('eventDate')?.setValue(new Date(this.visitDoctorForm.value.eventDate).toISOString());
+        const data = this.visitDoctorForm.value;
+        this.rest.updateVisitDoctor(this.visitDetails._id,data).subscribe(
+          {
+            next:(res:any)=>{
+              this.toster.showSuccess("You have Successfully updated your Visit","Visit Updated!!")
+              this.getDetails();
+            },
+            error:()=>{
+              this.loader = false;
+              this.toster.showError("Error in updating Visit, Please contact Admin","Visit updation Failed!!")
+            }
+          }
+        );
+      } else {
+        alert('Please fill in all required fields!');
+      }
+    }
+  
+    toggleStatus(res:any,status:string) {
+      this.loader = true;
+      const data = {
+        status:status,
+        bookingDate:res.bookEvents[0].bookingDate
+      }
+
+      this.rest.patientStatus(res,'visit-doctor',data).subscribe(
         {
           next:(res:any)=>{
-
+            this.loader = false;
+            this.toster.showSuccess("Successfully Changes the patient Status","Success!")
+            this.getAllPatientDetails(this.visitDetails._id);
           },
           error:()=>{
-
+            this.loader = false;
+            this.toster.showError("Failed to Change the patient Status","Failed!");
+            this.getAllPatientDetails(this.visitDetails._id);
           }
         }
       )
     }
   
-    // Toggle Status (Pending <-> Complete)
-    toggleStatus(index: number) {
-      this.patients[index].status = this.patients[index].status === 'Pending' ? 'Complete' : 'Pending';
-    }
-  
-    // Remove Patient from List
-    removePatient(index: number) {
-      
+    redirectToHome(){
+      this.router.navigate(['user']);
     }
 
     editStaffValue(staff:any){
@@ -253,31 +323,52 @@ export class VisitDoctorComponent {
     }
 
     updateStaff(){
-      this.isEditstaff = null;
-      const data = this.staffForm.value;
-      this.rest.updateVisitDocStaff(this.visitDetails._id, this.isEditstaff._id,data).subscribe(
-        {
-          next:(res:any)=>{
-
-          },
-          error:()=>{
-
+      if (this.staffForm.valid) {
+        this.loader = true;
+        const data = {
+          name:this.staffForm.value.name,
+          address:this.staffForm.value.address
+        };
+        this.rest.updateVisitDocStaff(this.visitDetails._id,this.isEditstaff._id,data).subscribe(
+          {
+            next:(res:any)=>{
+              this.isEditstaff = null;
+              this.staffForm.reset();
+              this.toster.showSuccess("You have Successfully updated your Staff","Staff Updated!!")
+              this.getDetails();
+            },
+            error:()=>{
+              this.loader = false;
+              this.toster.showError("Error in updating Staff, Please contact Admin","Visit updation Failed!!")
+            }
           }
-        }
-      )
+        );
+      } else {
+        alert('Please fill in all required fields!');
+      }
     }
 
     deleteVisit(){
-      this.rest.deleteVisitDoc(this.visitDetails._id).subscribe(
-        {
-          next:(res:any)=>{
-
-          },
-          error:()=>{
-
+      if(this.patients.length < 1){
+        this.loader = true;
+        this.rest.deleteVisitDoc(this.visitDetails._id).subscribe(
+          {
+            next:(res:any)=>{
+              if(res){
+                this.getDetails();
+                this.toster.showSuccess("You have successfully Deleted your Visit!!","Deleted Successfully!")
+              }
+            },
+            error:()=>{
+              this.loader = false;
+              this.toster.showError("There is Error in Deleting this Visit, Please contact admin","Error In Deleting!!")
+            }
           }
-        }
-      )
+        )
+      }else{
+        this.toster.showInfo("You can not delete this visit as"+ this.patients.length+"patients already Booked","Can Not Delete This Visit!")
+      }
+      
     }
 
     resetStaff(){
@@ -287,13 +378,23 @@ export class VisitDoctorComponent {
 
     onSubmit() {
       if (this.visitDoctorForm.valid) {
+        this.loader = true;
         this.visitDoctorForm.get('startTime')?.setValue(`${this.visitDoctorForm.value.eventDate}T${this.visitDoctorForm.value.startTime}:00.000Z`);
         this.visitDoctorForm.get('endTime')?.setValue(`${this.visitDoctorForm.value.eventDate}T${this.visitDoctorForm.value.endTime}:00.000Z`);
         this.visitDoctorForm.get('eventDate')?.setValue(new Date(this.visitDoctorForm.value.eventDate).toISOString());
         const data = this.visitDoctorForm.value;
-        this.rest.addVisitDoctor(data).subscribe((res:any)=>{
-          this.getDetails()
-        });
+        this.rest.addVisitDoctor(data).subscribe(
+          {
+            next:(res:any)=>{
+              this.toster.showSuccess("You have Successfully added your Visit","Visit Added!!")
+              this.getDetails();
+            },
+            error:()=>{
+              this.loader = false;
+              this.toster.showError("Error in adding Visit, Please contact Admin","Visit Failed!!")
+            }
+          }
+        );
       } else {
         alert('Please fill in all required fields!');
       }

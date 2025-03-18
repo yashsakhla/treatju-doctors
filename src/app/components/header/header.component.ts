@@ -30,6 +30,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
   loggedIn:boolean = false;
 
   selectedCityFromDropdown: string = ''; // Store city from dropdown
+  role!:string;
 
   constructor(
     private rest: RestService,
@@ -40,6 +41,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
+    this.role = this.rest.userData.role;
     this.loggedIn = this.auth.isUserLoggedIn;
     setInterval(() => {
       this.nextSlide();
@@ -115,7 +117,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
   }
 
   redirect(path: string) {
-    this.router.navigate([path]);
+    this.router.navigate([path.toLocaleLowerCase()]);
   }
 
   nextSlide() {

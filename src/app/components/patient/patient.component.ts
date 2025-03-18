@@ -70,6 +70,8 @@ export class PatientComponent implements OnInit, OnDestroy {
   city!:string;
   loader!:boolean;
   isUserLoggedin!:boolean;
+  selectedDate!:string;
+  selectedService:any;
 
   private subscription!: Subscription;
   constructor(private rest:RestService, private toster:TosterService, private auth:AuthService, private router:Router){
@@ -77,15 +79,25 @@ export class PatientComponent implements OnInit, OnDestroy {
         this.loader = res;
       })
       this.subscription = rest.eventDetails.subscribe((res:any)=>{
-        this.eventObj = res;
+        this.eventObj = this.filterEvents(res);
         this.city = rest.selectedCity;
         this.updateNotifications(this.eventObj,this.buttons);
         this.loader = false;
       })
   }
 
+  filterEvents(res: any) {
+    return {
+      freeCampEvents: res.freeCampEvents, // No filtering needed
+      visitDoctors: res.visitDoctors.filter((doctor: any) => doctor.visitDetails.length > 0),
+      labs: res.labs.filter((lab: any) => lab.availableServices.length > 0),
+      hospitals: res.hospitals.filter((hospital: any) => hospital.availableServices.length > 0),
+    };
+  }
+
   getIsoString(date:any){
-    return new Date(date).toISOString();
+    const istOffset = 6.5 * 60 * 60 * 1000;
+    return new Date(date).getTime() + istOffset;
   }
 
   @ViewChild('myModal') modalElement!: ElementRef;
@@ -115,6 +127,7 @@ export class PatientComponent implements OnInit, OnDestroy {
       {
         next:(res:any)=>{
           this.getCityDetails();
+          this.getUserDetails();
           this.toster.showSuccess("Event Booked!!","You Have successfully Book an Organzer Free Camp Event.");
         },
         error:(err:Error)=>{
@@ -130,6 +143,7 @@ export class PatientComponent implements OnInit, OnDestroy {
     const currentDate = new Date();
     this.today = currentDate.toISOString().split('T')[0];
     this.isUserLoggedin = this.auth.isUserLoggedIn;
+    this.userData = this.rest.userData;
     if(this.isUserLoggedin){
       this.getUserDetails();
     }
@@ -142,8 +156,8 @@ export class PatientComponent implements OnInit, OnDestroy {
           this.userData = res;
         },
         error:()=>{
-
-        }
+          this.toster.showError("Error Fetching User Details!!","Error!")
+        } 
       }
     )
   }
@@ -165,9 +179,8 @@ export class PatientComponent implements OnInit, OnDestroy {
 
   // Assign the calculated notification count
   button.notification = notificationCount;
-      if(button.active){
+    if(button.active){
         this.showContent = eventObject[key];
-        console.log(this.showContent);
         this.btnName = button.name;
       }
       console.log(this.showContent);
@@ -185,12 +198,28 @@ export class PatientComponent implements OnInit, OnDestroy {
     this.showContent = this.eventObj[selectedKey];
   }
 
-  submitBooking(){
-    
-  }
-
-  book(){
+  book(data:any){
     this.modalInstance.hide();
+    this.loader = true;
+    const payload = {
+      bookingDate:new Date(this.selectedDate),
+      status:"Booked"
+    }
+    this.rest.bookService(data._id,this.selectedService._id,payload,this.activeButton).subscribe(
+      {
+        next:(res:any)=>{
+          if(res){
+            this.getCityDetails();
+            this.getUserDetails();
+            this.toster.showSuccess("Service Booked!!","You Have successfully Book Hospital.");
+          }
+        },
+        error:(err:Error)=>{
+          this.loader = false;
+          this.toster.showError("Booking Failed!",err.message);
+        }
+      }
+    );
   }
 
   bookVisit(data:any, visit:any){
@@ -217,7 +246,7 @@ export class PatientComponent implements OnInit, OnDestroy {
   }
 
   isBtnDisabled(data:any){
-    return this.userData.bookEvents.some((item:any) => item == data._id);
+    return this.userData.bookEvents.some((item:any) => data?.eventName ? item.serviceId == data._id : item.providerId == data._id);
   }
 
   redirect(path:string){

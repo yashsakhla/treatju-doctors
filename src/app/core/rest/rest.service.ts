@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of, retry } from 'rxjs';
 import { api_url } from '../../../enviorment';
 import { TosterService } from '../toster/toster.service';
 
@@ -17,7 +17,6 @@ export class RestService {
 
 
   userData:any;
-  userRole!:string;
   selectedCity!:string;
 
   apiUrl = 'http://localhost:3000/users'; 
@@ -78,7 +77,7 @@ export class RestService {
   }
 
   deleteStaff(staffId:any, eventId:any){
-    return this.http.delete(`${api_url}organizer/delete-doctor/${eventId}/${staffId}`);
+    return this.http.delete(`${api_url}organizer/delete-staff/${eventId}/${staffId}`);
   }
   
 
@@ -115,14 +114,116 @@ export class RestService {
   }
 
   bookFreeCamp(city:string,eventId:any,doctorId:any, data:any){
-   return this.http.post(`${api_url}organizer/${city}/${eventId}/${doctorId}/book`,data);
+   return this.http.post(`${api_url}patient/book-camp-doctor/${city}/${eventId}/${doctorId}`,data);
   }
 
   bookVisitDoctor(doctorId:any,visitDetailId:string, data:any){
-   return this.http.post(`${api_url}visit-doctor/${doctorId}/${visitDetailId}/book`,data);
+   return this.http.post(`${api_url}patient/book-visit-doctor/${doctorId}/${visitDetailId}`,data);
   }
 
   getPatinetDetails(){
     return this.http.get(`${api_url}patient/profile`);
   }
+
+  getlabDetails(){
+    return this.http.get(`${api_url}labs/lab-details`);
+  }
+
+  updateLabSchedule(payload:any){
+    return this.http.put(`${api_url}labs/update-time`,payload);
+  }
+
+  addlabService(payload:any){
+    return this.http.post(`${api_url}labs/create-available-services`, payload);
+  }
+
+  updatelabService(service:any,payload:any){
+    return this.http.put(`${api_url}labs/update-available-services/${service.name}`, payload);
+  }
+
+  deleteLabService(serviceId:any){
+    return this.http.delete(`${api_url}labs/delete-available-services/${serviceId}`);
+  }
+
+  addLabStaff(payload:any){
+    return this.http.post(`${api_url}labs/create-staff`, payload);
+  }
+
+  updateLabStaff(staffId:any, payload:any){
+    return this.http.put(`${api_url}labs/edit-staff/${staffId}`, payload);
+  }
+
+  deleteLabStaff(labId:any,staffId:any){
+    return this.http.delete(`${api_url}labs/delete-staff/${staffId}`);
+  }
+
+  gethospitalDetails(){
+    return this.http.get(`${api_url}hospital/hospital-details`);
+  }
+
+  updatehospitalSchedule(payload:any){
+    return this.http.put(`${api_url}hospital/update-time`,payload);
+  }
+
+  addhospitalService(payload:any){
+    return this.http.post(`${api_url}hospital/create-available-services`, payload);
+  }
+
+  updatehospitalService(serviceId:any,payload:any){
+    return this.http.post(`${api_url}hospital/update-available-services`, payload);
+  }
+
+  deleteHospitalService(serviceId:any){
+    return this.http.delete(`${api_url}hospital/delete-available-services/${serviceId}`);
+  }
+
+  addHospitalStaff(payload:any,labId:any){
+    return this.http.post(`${api_url}hospital/create-staff`, payload);
+  }
+
+  updateHospitalStaff(labId:any,staffId:any, payload:any){
+    return this.http.put(`${api_url}hospital/create-staff/${staffId}`, payload);
+  }
+
+  deleteHospitalStaff(labId:any,staffId:any){
+    return this.http.delete(`${api_url}hospital/delete-staff/${staffId}`);
+  }
+
+  addHospitalDoctor(payload:any){
+    return this.http.post(`${api_url}hospital/create-doctor`, payload);
+  }
+
+  updateHospitalDoctor(doctorId:any,payload:any){
+    return this.http.put(`${api_url}hospital/create-doctor/${doctorId}`, payload);
+  }
+
+  deleteHospitalDoctor(doctorId:any){
+    return this.http.delete(`${api_url}hospital/delete-doctor/${doctorId}`);
+  }
+
+  bookService(mainId:any, serviceId:any,payload:any, serviceType:any){
+    console.log(serviceType)
+    if(serviceType == "labs"){
+      return this.http.post(`${api_url}patient/book-lab/${mainId}/${serviceId}`,payload);
+    }else{
+      return this.http.post(`${api_url}patient/book-hospital/${mainId}/${serviceId}`,payload);
+    }
+  }
+
+  getPatientList(providerId:any,serviceId:any){
+   return this.http.get(`${api_url}patient/get-patients/${providerId}/${serviceId}`);
+  }
+
+  getAllPatients(providerId?:any,isFor?:string){
+    const allowedRoles = ['OrganizerStaff', 'OrganizerDoctor', 'VisitDoctorStaff', 'LabStaff', 'HospitalStaff','HospitalDoctor'];
+    if(allowedRoles.includes(this.userData.role)){
+      return this.http.get(`${api_url+isFor}/get-all-patients`);
+    }else{
+      return this.http.get(`${api_url}patient/get-all-patients/${providerId}`);
+    }
+   }
+
+   patientStatus(patient:any,isFor:any,payload:any){
+    return this.http.put(`${api_url+isFor}/${patient.bookEvents[0].serviceId}/patient/${patient._id}`,payload);
+   }
 }

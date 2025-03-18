@@ -42,7 +42,6 @@ export class LoginComponent {
         const name = res.userDetails.username ? res.userDetails.username : res.userDetails.name;
         this.toaster.showSuccess("You have successfully LoggedIn!","Hey,"+name);
         this.auth.setAuth(res.access_token);
-        this.rest.userData = res.userDetails; 
         switch (res.userDetails.role) {
           case 'Patient':
             this.router.navigate(['/user']);
@@ -59,14 +58,14 @@ export class LoginComponent {
             this.router.navigate(['/visit-doctor']);
             break;
       
-          case 'lab':
-          case 'labStaff':
+          case 'Lab':
+          case 'LabStaff':
             this.router.navigate(['/lab']);
             break;
       
-          case 'hospital':
-          case 'hospitalDoctor':
-          case 'hospitalStaff':
+          case 'Hospital':
+          case 'HospitalDoctor':
+          case 'HospitalStaff':
             this.router.navigate(['/hospital']);
             break;
       

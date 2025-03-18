@@ -14,8 +14,8 @@
                 <input type="tel" class="form-control" name="mobile" id="mobile" [(ngModel)]="mobile" placeholder="Enter your mobile number" required>
               </div>
               <div class="form-group pt-3">
-                <label for="pass">Password (4 numbers)</label>
-                <input type="password" class="form-control" name="pass" id="pass" [(ngModel)]="pass" placeholder="Enter 4-digit password" pattern="\d{4}" required>
+                <label for="pass">Password (6 numbers)</label>
+                <input type="password" class="form-control" name="pass" id="pass" [(ngModel)]="pass" placeholder="Enter 6-digit password" pattern="\d{6}" required>
               </div>
               <button type="submit" class="btn btn-dark btn-block mt-3 col-12" (click)="login()">Log In</button>
               

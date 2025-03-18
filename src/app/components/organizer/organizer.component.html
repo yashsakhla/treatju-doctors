@@ -80,7 +80,7 @@
     <div class="header">
       <div class="header-main d-flex align-items-center w-100 justify-content-between">
         <div class="right d-flex gap-3">
-          <div class="d-flex gap-1 align-items-center"><i class="bi bi-house-door fa-lg mr-3 mb-0"> </i> <p class="mb-0">Home</p></div>
+          <div class="d-flex gap-1 align-items-center" (click)="redirectToHome()"><i class="bi bi-house-door fa-lg mr-3 mb-0"> </i> <p class="mb-0">Home</p></div>
           <div class="d-flex gap-1 align-items-center"><i class="bi bi-printer mb-0"></i> <p class="mb-0">Print</p></div>
          <div class="d-flex gap-1 align-items-center"> <i class="bi bi-arrow-clockwise mb-0"></i> <p class="mb-0" (click)="refresh()">Refresh</p></div>
         </div>
@@ -202,9 +202,9 @@
               <tr>
                 <th>Type</th>
                 <th>Name</th>
-                <th>Place/Address</th>
+                <th>Place</th>
                 <th>Date/Mobile</th>
-                <th>Start Time/Pass</th>
+                <th>Start Time</th>
                 <th>End Time</th>
               </tr>
             </thead>
@@ -213,9 +213,9 @@
                 <td>Event</td>
                 <td>{{ events.eventName }}</td>
                 <td>{{ events.eventPlace }}</td>
-                <td>{{ events.eventDate | date:'dd MM YYYY' }}</td>
-                <td>{{ events.startTime }}</td>
-                <td>{{ events.endTime }}</td>
+                <td>{{ events.eventDate | date:'dd MMMM YYYY' }}</td>
+                <td>{{ events.startTime | date:'hh:mm a'}}</td>
+                <td>{{ events.endTime | date:'hh:mm a'}}</td>
               </tr>
             </tbody>
           </table>
@@ -251,6 +251,7 @@
                   formControlName="mobile"
                   class="form-control"
                   placeholder="Enter mobile no"
+                  [class.disabled]="isEditDoctor"
                   [class.is-invalid]="
                     doctorForm.get('mobile')?.invalid &&
                     doctorForm.get('mobile')?.touched
@@ -273,6 +274,7 @@
                   type="password"
                   formControlName="password"
                   class="form-control"
+                  [class.disabled]="isEditDoctor"
                   placeholder="Enter password"
                   required
                 />
@@ -289,13 +291,14 @@
             </button>
           </form>
                   <!-- Doctor Table -->
-        <div class="mt-4" *ngIf="doctors.length > 0">
+        <div class="mt-4" *ngIf="!(doctors.length < 1)">
           <h5>Doctor List</h5>
           <table class="table table-bordered">
             <thead>
               <tr>
                 <th>Doctor Name</th>
                 <th>Mobile No</th>
+                <th>Address</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -303,6 +306,7 @@
               <tr *ngFor="let doctor of doctors; let i = index">
                 <td>{{ doctor.name }}</td>
                 <td>{{ doctor.mobile }}</td>
+                <td>{{ doctor.address }}</td>
                 <td>
                   <div class="d-flex justify-content-center align-items-center gap-3">
                     <button class="btn btn-danger btn-sm" (click)="deleteDoctor(doctor)">
@@ -347,6 +351,7 @@
                 <input
                   formControlName="mobile"
                   class="form-control"
+                  [class.disabled]="isEditstaff"
                   placeholder="Enter mobile no"
                   [class.is-invalid]="
                     staffForm.get('mobile')?.invalid &&
@@ -370,6 +375,7 @@
                   type="password"
                   formControlName="password"
                   class="form-control"
+                  [class.disabled]="isEditstaff"
                   placeholder="Enter password"
                   required
                 />
@@ -385,13 +391,14 @@
               Reset Staff
             </button>
           </form>
-          <div class="mt-4" *ngIf="staff.length > 0">
+          <div class="mt-4" *ngIf="!(staff.length < 1)">
             <h5>Staff List</h5>
             <table class="table table-bordered">
               <thead>
                 <tr>
                   <th>Staff Name</th>
                   <th>Mobile No</th>
+                  <th>Address</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -399,6 +406,7 @@
                 <tr *ngFor="let staff of staff; let i = index">
                   <td>{{ staff.name }}</td>
                   <td>{{ staff.mobile }}</td>
+                  <td>{{ staff.address }}</td>
                   <td>
                     <div class="d-flex justify-content-center align-items-center gap-3">
                       <button class="btn btn-danger btn-sm" (click)="deleteStaff(staff)">
@@ -440,23 +448,51 @@
               <td>{{ patient.mobile }}</td>
   
               <!-- Status Toggle -->
-              <td>
-                <button
-                  class="btn"
-                  [ngClass]="{
-                    'btn-warning': patient.status === 'Pending',
-                    'btn-success': patient.status === 'Complete'
-                  }"
-                  (click)="toggleStatus(i)"
+                <!-- Status Toggle -->
+                <td
+                class="d-flex justify-content-center align-items-center gap-2"
+              >
+                <p
+                  class="mb-0"
+                  [ngClass]="
+                    patient.bookEvents[0].status == 'Completed'
+                      ? 'text-muted'
+                      : 'fw-bold'
+                  "
                 >
-                  {{ patient.status }}
-                </button>
+                  Pending
+                </p>
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [class.disabled]="
+                      patient.bookEvents[0].status == 'Completed' || patient.bookEvents[0].status == 'Cancel'
+                    "
+                    [checked]="patient.bookEvents[0].status == 'Completed'"
+                    (change)="toggleStatus(patient,'Completed', showDoctor)"
+                  />
+                </div>
+                <p
+                  class="mb-0"
+                  [ngClass]="
+                    patient.bookEvents[0].status == 'Completed'
+                      ? 'fw-bold'
+                      : 'text-muted'
+                  "
+                >
+                  Completed
+                </p>
               </td>
-  
+
               <!-- Cancel Button -->
               <td>
-                <button class="btn btn-danger btn-sm" (click)="removePatient(i)">
-                  <i class="bi bi-trash"></i> Cancel
+                <button
+                  class="btn btn-danger btn-sm"
+                  [class.disabled]="patient.bookEvents[0].status == 'Completed' || patient.bookEvents[0].status == 'Cancel'"
+                  (click)="toggleStatus(patient,'Cancel', showDoctor)"
+                >
+                  <i class="bi bi-trash"></i> {{patient.bookEvents[0].status == 'Cancel' ? 'Cancelled' : 'Cancel'}}
                 </button>
               </td>
             </tr>
@@ -485,7 +521,7 @@
             </tr>
           </thead>
   
-          <tbody *ngIf="patients.length > 0">
+          <tbody *ngIf="!(patients.length < 1)">
             <tr *ngFor="let patient of patients; let i = index">
               <td>{{ i + 1 }}</td>
               <td>{{ patient.name }}</td>
@@ -494,25 +530,52 @@
               <td>{{ patient.mobile }}</td>
   
               <!-- Status Toggle -->
-              <td>
-                <button
-                  class="btn"
-                  [ngClass]="{
-                    'btn-warning': patient.status === 'Pending',
-                    'btn-success': patient.status === 'Complete'
-                  }"
-                  (click)="toggleStatus(i)"
-                >
-                  {{ patient.status }}
-                </button>
-              </td>
-  
-              <!-- Cancel Button -->
-              <td>
-                <button class="btn btn-danger btn-sm" (click)="removePatient(i)">
-                  <i class="bi bi-trash"></i> Cancel
-                </button>
-              </td>
+              <td
+              class="d-flex justify-content-center align-items-center gap-2"
+            >
+              <p
+                class="mb-0"
+                [ngClass]="
+                  patient.bookEvents[0].status == 'Completed'
+                    ? 'text-muted'
+                    : 'fw-bold'
+                "
+              >
+                Pending
+              </p>
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  [class.disabled]="
+                    patient.bookEvents[0].status == 'Completed' || patient.bookEvents[0].status == 'Cancel'
+                  "
+                  [checked]="patient.bookEvents[0].status == 'Completed'"
+                  (change)="toggleStatus(patient,'Completed')"
+                />
+              </div>
+              <p
+                class="mb-0"
+                [ngClass]="
+                  patient.bookEvents[0].status == 'Completed'
+                    ? 'fw-bold'
+                    : 'text-muted'
+                "
+              >
+                Completed
+              </p>
+            </td>
+
+            <!-- Cancel Button -->
+            <td>
+              <button
+                class="btn btn-danger btn-sm"
+                [class.disabled]="patient.bookEvents[0].status == 'Completed' || patient.bookEvents[0].status == 'Cancel'"
+                (click)="toggleStatus(patient,'Cancel')"
+              >
+                <i class="bi bi-trash"></i> {{patient.bookEvents[0].status == 'Cancel' ? 'Cancelled' : 'Cancel'}}
+              </button>
+            </td>
             </tr>
           </tbody>
           <tbody *ngIf="!showDoctor?.patient">

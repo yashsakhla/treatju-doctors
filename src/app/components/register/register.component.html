@@ -12,18 +12,23 @@
           <form #registerForm="ngForm" class="row">
             <!-- Role Selection -->
             <div class="form-group">
-              <label>I am a:</label><br />
-              <label *ngFor="let role of roles">
-                <input
-                  type="radio"
-                  name="role"
-                  [value]="role"
-                  [(ngModel)]="selectedRole"
-                  (change)="onRoleChange()"
-                />
-                {{ role }}
-              </label>
+              <label class="fw-bold">I am a:</label><br />
+              <div class="btn-group d-flex flex-wrap" role="group" aria-label="Role Selection">
+                <button
+                  *ngFor="let role of roles"
+                  type="button"
+                  class="btn btn-sm flex-grow-1 m-1"
+                  [ngClass]="{
+                    'btn-primary': selectedRole === role,
+                    'btn-outline-primary': selectedRole !== role
+                  }"
+                  (click)="selectedRole = role; onRoleChange()"
+                >
+                  <i [class]="getRoleIcon(role)"></i> {{ role }}
+                </button>
+              </div>
             </div>
+            
 
             <!-- User Name -->
             <div class="form-group col-6">
@@ -54,6 +59,36 @@
                 required
               />
             </div>
+
+            <div class="form-group col-6" *ngIf="selectedRole == 'Patient'">
+              <label class="fw-bold">Gender</label><br />
+              <div class="btn-group d-flex w-100" role="group">
+                <button
+                  type="button"
+                  class="btn btn-sm flex-fill"
+                  [ngClass]="{
+                    'btn-primary': selectedGender === 'Male',
+                    'btn-outline-primary': selectedGender !== 'Male'
+                  }"
+                  (click)="selectedGender = 'Male'"
+                >
+                  <i class="bi bi-gender-male"></i> Male
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm flex-fill"
+                  [ngClass]="{
+                    'btn-danger': selectedGender === 'Female',
+                    'btn-outline-danger': selectedGender !== 'Female'
+                  }"
+                  (click)="selectedGender = 'Female'"
+                >
+                  <i class="bi bi-gender-female"></i> Female
+                </button>
+              </div>
+            </div>
+          
+          
 
             <div class="form-group col-6" *ngIf="selectedRole != 'Patient' && selectedRole != 'Organizer'">
               <label for="age">ID</label>
@@ -126,26 +161,26 @@
               </small>
             </div>
 
-            <!-- Password (4-digit limit) -->
+            <!-- Password (6-digit limit) -->
             <div class="form-group col-6">
-              <label for="password">Set Password (4 numbers)</label>
+              <label for="password">Set Password (6 numbers)</label>
               <input
                 type="password"
                 class="form-control"
                 id="password"
                 name="password"
                 pattern="\d{6}"
-                placeholder="Enter 4-digit password"
+                placeholder="Enter 6-digit password"
                 [(ngModel)]="password"
-                minlength="4"
-                maxlength="6"
+                minlength="6"
+                maxlength="9"
                 required
               />
               <small
                 *ngIf="password && password.length !== 6"
                 class="text-danger"
               >
-                Password must be exactly 4 digits.
+                Password must be exactly 6 digits.
               </small>
             </div>
 

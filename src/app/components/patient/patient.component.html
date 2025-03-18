@@ -18,7 +18,7 @@
         <div class="row" *ngIf="showContent.length > 0">
           <div class="container mt-4" *ngIf="btnName == 'Free Camp'">       
             <div class="container" *ngFor="let data of showContent">
-              <h4 class="fw-bold text-left mb-3">{{ data.name }}</h4>
+              <h4 class="fw-bold text-left mb-3">{{ data.eventName }}</h4>
               <div class="table-responsive">
                 <table class="table shadow-sm">
                   <thead class="table-dark">
@@ -35,7 +35,7 @@
                       <td class="text-sm py-3 px-2">
 
                         <div class="fw-600">{{ data.eventDate | date:'dd-MM-yy' }}</div>
-                        <div class="small text-muted">{{ getIsoString(data.startTime) | date:'h a' }} to {{ getIsoString(data.endTime) | date:'h a' }}</div>
+                        <div class="small text-muted">{{ getIsoString(data.startTime) | date:'HH:mm a' }} to {{ getIsoString(data.endTime) | date:'HH:mm a' }}</div>
                       </td>
               
                       <!-- Doctors Column -->
@@ -51,9 +51,9 @@
                         <button type="button" class="btn btn-dark btn-sm px-3 py-2"
                           [disabled]="isBtnDisabled(data)" 
                           (click)="bookCamp(data, doc)" *ngIf="isUserLoggedin">
-                          <i class="bi bi-calendar-check"></i> Book Now
+                          <i class="bi bi-calendar-check"></i> {{isBtnDisabled(data) ? 'Already Booked' : 'Book' }}
                         </button>
-                        <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
+                        <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin || userData.role !== 'Patient'" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
                       </td>
                     </tr>
                   </tbody>
@@ -94,11 +94,11 @@
                       <!-- Booking Column -->
                       <td class="text-sm py-3 px-2 text-right" style="text-align: right;">
                         <button type="button" class="btn btn-dark btn-sm px-3 py-2"
-                          [disabled]="false" 
+                        [disabled]="isBtnDisabled(data)"
                           (click)="bookVisit(data, visit)" *ngIf="isUserLoggedin">
-                          <i class="bi bi-calendar-check"></i> Book Now
+                          <i class="bi bi-calendar-check"></i> {{isBtnDisabled(data) ? 'Already Booked' : 'Book' }}
                         </button>
-                        <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
+                        <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin || userData.role !== 'Patient'" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
                       </td>
                     </tr>
                   </tbody>
@@ -108,24 +108,25 @@
             
           </div>
 
-          <div *ngIf="btnName == 'Labs' || btnName == 'Hospitals'">
+          <div *ngIf="btnName == 'Labs' || btnName == 'Hospitals'" class="row">
               <div class="col-sm-4" *ngFor="let data of showContent">
                 <div class="card shadow-sm">
                   <div class="card-header bg-light py-3">
-                    <h3 class="mb-0">{{ data.name }}</h3>
+                    <h3 class="mb-0">{{ data.username }}</h3>
                   </div>
                   <div class="card-body bg-white">
-                    <p class="text-muted mb-2">{{ data.place }}</p>
+                    <p class="text-muted mb-2">{{ data.address }}</p>
                     
                     <h6 class="fw-bold">Available Services:</h6>
                     <ul class="mb-4">
-                      <li *ngFor="let service of data.category">{{ service }}</li>
+                      <li *ngFor="let service of data.availableServices">{{ service.name }}</li>
                     </ul>
                     
                     <div class="d-flex justify-content-end">
-                      <button type="button" class="btn btn-dark" [disabled]="data.booked" (click)="openModal(data)">
-                        {{ data.booked ? 'Already Booked' : 'Book Now' }}
+                      <button type="button" class="btn btn-dark" [disabled]="isBtnDisabled(data)" (click)="openModal(data)" *ngIf="isUserLoggedin">
+                        {{isBtnDisabled(data) ? 'Already Booked' : 'Book' }}
                       </button>
+                      <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin || userData.role !== 'Patient'" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
                     </div>
                   </div>
                 </div>
@@ -158,21 +159,23 @@
       <!-- Modal Body -->
       <div class="modal-body">
         <label class="form-label fw-semibold mb-1 pt-2">{{btnName}} Name</label>
-        <input class="form-control" type="text" [disabled]="true" [value]= "modalData?.name">
+        <input class="form-control" type="text" [disabled]="true" [value]= "modalData?.username">
 
         <label class="form-label fw-semibold mb-1 pt-4">Select Service</label>
-        <select class="form-select mb-3">
-          <option selected disabled>Select-Service</option>
-          <option *ngFor="let data of modalData?.category">{{data}}</option>
-        </select>
+        <select class="form-select mb-3" [(ngModel)]="selectedService">
+          <option selected disabled [ngValue]="null">Select Service</option>
+          <option *ngFor="let data of modalData?.availableServices" [ngValue]="data">
+            {{ data.name }}
+          </option>
+        </select>        
 
         <label class="form-label fw-semibold mb-1 pt-2" >Select Date</label>
-        <input class="form-control" type="date" [min]="today">
+        <input class="form-control" type="datetime-local" [min]="today" [(ngModel)]="selectedDate">
       </div>
 
       <!-- Modal Footer -->
       <div class="modal-footer border-0">
-        <button type="button" class="btn btn-success w-100 fw-bold" (click)="book()">Book Now</button>
+        <button type="button" class="btn btn-success w-100 fw-bold" (click)="book(modalData)" [class.disabled]="!selectedDate || !selectedService">Book Now</button>
       </div>
 
     </div>
