@@ -107,6 +107,7 @@ export class OrganizerComponent implements OnInit, OnDestroy {
   showStaff!:Staff;
   loader!:boolean;
   userData:any;
+  isFirstLoad: boolean=true;
 
   
 
@@ -137,12 +138,11 @@ export class OrganizerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.loggedIn = this.auth.isUserLoggedIn;
+    this.loggedIn = this.auth.getAuth();
     this.userData = this.rest.userData;
     if(this.userData.role == 'Organizer'){
       this.show = 'dashboard';
       this.getDetails();
-      this.getAllPatientDetails(this.events._id);
     }else if(this.userData.role == 'OrganizerDoctor'){
       this.showDoctor = this.userData;
       this.show = this.showDoctor.name;
@@ -167,6 +167,8 @@ export class OrganizerComponent implements OnInit, OnDestroy {
           this.events = res[0];
           if(res){
             this.patchValue(this.events);
+            this.doctorForm.reset();
+            this.staffForm.reset();
             this.doctors = this.events.doctors;
             this.staff = this.events.staff;
             this.loader = false;
@@ -175,9 +177,9 @@ export class OrganizerComponent implements OnInit, OnDestroy {
             }
           }
         },
-        error:()=>{
+        error:(err:any)=>{
           this.loader = false;
-          this.toster.showError("Error Fetching Event Details","Failed Fetching Events!")
+          this.toster.showError("Failed Fetching Events!",err.error.message)
         }
       }
     )
@@ -191,10 +193,13 @@ export class OrganizerComponent implements OnInit, OnDestroy {
         next:(res:any)=>{
           this.loader = false;
           this.patients = res;
+          if(this.userData.role == 'Organizer'){
+            this.updateDashboardData(this.doctors,this.staff);
+          }
         },
-        error:()=>{
-          this.toster.showError("Error Fetching Patinets!","Please contact Admin!!")
+        error:(err:any)=>{
           this.loader = false;
+          this.toster.showError(err.error.message," Patients Not Found!");
         }
       }
     )
@@ -208,10 +213,13 @@ export class OrganizerComponent implements OnInit, OnDestroy {
         next:(res:any)=>{
           this.patients = res;
           this.loader = false;
+          if(this.userData.role == 'Organizer'){
+            this.updateDashboardData(this.doctors,this.staff);
+          }
         },
-        error:()=>{
-          this.toster.showError("Error Fetching Patinets!","Please contact Admin!!");
+        error:(err:any)=>{
           this.loader = false;
+          this.toster.showError(err.error.message," Patients Not Found!");
         }
       }
     )
@@ -219,23 +227,28 @@ export class OrganizerComponent implements OnInit, OnDestroy {
 
   updateDashboardData(doctor:Doctor[], staff:Staff[]) {
     // Flatten all patient arrays from doctors into one array
+
+    if (this.isFirstLoad && this.events?._id) {
+      this.getServicePatient();
+      this.isFirstLoad = false;
+    }
   
     // Update dashboard data
     this.dashboardData = this.dashboardData.map((item) => {
       if (item.title === 'Total Doctors') {
         return { ...item, value: doctor.length };
       } else if (item.title === 'Total Bookings') {
-        return { ...item, value: this.patients.length }; // Assuming patients represent bookings
+        return { ...item, value: this.patients.length };
       } else if(item.title === 'Total Staff'){
         return { ...item, value: staff.length };
       }else if(item.title === 'Pending Bookings'){
-        return { ...item, value: this.patients.filter((p:any)=> p.status === 'Pending').length };
+        return { ...item, value: this.patients.filter((p:any)=> p.bookEvents[0].status === 'Pending').length };
       }
       else if(item.title === 'Completed Bookings'){
-        return { ...item, value: this.patients.filter((p:any) => p.status === 'Completed').length };
+        return { ...item, value: this.patients.filter((p:any) => p.bookEvents[0].status === 'Completed').length };
       }
       else if(item.title === 'Cancel Bookings'){
-        return { ...item, value: this.patients.filter((p:any) => p.status === 'Cancel').length };
+        return { ...item, value: this.patients.filter((p:any) => p.bookEvents[0].status === 'Cancel').length };
       }
       return item;
     });
@@ -269,9 +282,26 @@ export class OrganizerComponent implements OnInit, OnDestroy {
       this.getPatientDetails(this.showDoctor._id,this.events._id);
     }else{
       this.showStaff = isdDoctor;
-      this.getAllPatientDetails(this.events._id);
+      this.getServicePatient();
     }
-    
+  }
+
+  getServicePatient(){
+    this.rest.getAllservicePatients(this.events._id).subscribe(
+      {
+        
+        next:(res:any)=>{
+          this.patients = res;
+          this.loader = false;
+          if(this.userData.role == 'Organizer'){
+            this.updateDashboardData(this.doctors,this.staff);
+          }
+        },
+        error:(err:any)=>{
+          this.loader = false;
+          this.toster.showError(err.error.message," Patients Not Found!");
+        }
+    })
   }
 
   resetDoctor(){
@@ -343,9 +373,9 @@ export class OrganizerComponent implements OnInit, OnDestroy {
               this.toster.showSuccess("Event Updated Successfully!", "Event Updated!!");
             }
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Event Updated Failed!", "Event Update Failed!!")
+            this.toster.showError("Event Updated Failed!",err.error.message)
           }
         }
       );
@@ -354,9 +384,11 @@ export class OrganizerComponent implements OnInit, OnDestroy {
   }
 
   addDoctor() {
+    if(!this.events){alert("Please add Event First!!"); return}
     if (this.doctorForm.valid) {
       this.loader = true;
       const data = this.doctorForm.value;
+      data.role = "OrganizerDoctor";
       this.rest.addEventDoctor(data, this.events._id).subscribe( {
         next:(res:any)=>{
           if(res){
@@ -364,9 +396,9 @@ export class OrganizerComponent implements OnInit, OnDestroy {
             this.toster.showSuccess("Doctor Added to organizer camp Successfully!","Doctor Added!!")
           }
         },
-        error:()=>{
+        error:(err:any)=>{
           this.loader = false;
-          this.toster.showError("Failed to Add Doctor to camp, Check with Admin.","Failed to Add Doctor!")
+          this.toster.showError("Failed to Add Doctor!",err.error.message);
         }
       })
     }
@@ -388,15 +420,16 @@ export class OrganizerComponent implements OnInit, OnDestroy {
             this.toster.showSuccess("Doctor Changes Are edited Successfully!","Edited Successfully!");
           }
         },
-        error:()=>{
+        error:(err:any)=>{
           this.loader = false;
-          this.toster.showError("Error Editing Doctor Changes, Please contact admin.","Error Editing Doctor!")
+          this.toster.showError("Error Editing Doctor!",err.error.message);
         }
       })
     }
   }
 
   addStaff() {
+    if(!this.events){alert("Please add Event First!!"); return};
     if (this.staffForm.valid) {
       this.loader = true;
       const data = this.staffForm.value
@@ -408,9 +441,9 @@ export class OrganizerComponent implements OnInit, OnDestroy {
             this.getDetails();
             this.toster.showSuccess("Staff Added to organizer camp Successfully!","Staff Added!!")
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Failed to Add Staff to camp, Check with Admin.","Failed to Add Staff!")
+            this.toster.showError("Failed to Add Staff!",err.error.message)
           }
         }
       )
@@ -432,9 +465,9 @@ export class OrganizerComponent implements OnInit, OnDestroy {
             this.getDetails();
             this.toster.showSuccess("Staff Changes Are edited Successfully!","Edited Successfully!");
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Error Editing Staff Changes, Please contact admin.","Error Editing Staff!");
+            this.toster.showError("Error Editing Staff!",err.error.message);
           }
         }
       )
@@ -450,9 +483,9 @@ export class OrganizerComponent implements OnInit, OnDestroy {
         this.getDetails();
         this.toster.showSuccess("Doctor is deleted Successfully!","Deleted Successfully!");
       },
-      error:()=>{
+      error:(err:any)=>{
         this.loader = false;
-        this.toster.showError("Error Deleting Doctor Changes, Please contact admin.","Error Deleting Doctor!")
+        this.toster.showError("Error Deleting Doctor!",err.error.message);
       }
     })
   }
@@ -466,9 +499,9 @@ export class OrganizerComponent implements OnInit, OnDestroy {
         this.getDetails();
         this.toster.showSuccess("Staff Changes Are Deleted Successfully!","Deleted Successfully!");
       },
-      error:()=>{
+      error:(err:any)=>{
         this.loader = false;
-        this.toster.showError("Error Deleting Doctor Changes, Please contact admin.","Error Deleting Doctor!")
+        this.toster.showError("Error Deleting Doctor!",err.error.message)
       }
     })
   }
@@ -481,24 +514,24 @@ export class OrganizerComponent implements OnInit, OnDestroy {
       bookingDate:res.bookEvents[0].bookingDate
     }
 
-    this.rest.patientStatus(res,'Labs',data).subscribe(
+    this.rest.patientStatus(res,'organizer',data).subscribe(
       {
         next:(res:any)=>{
           this.loader = false;
           this.toster.showSuccess("Successfully Changes the patient Status","Success!")
-          if(service){
-            this.getPatientDetails(service._id,this.events._id);
+          if(this.userData.role !== 'Organizer'){
+            this.getAllPatientDetails(service._id);
           }else{
-            this.getAllPatientDetails(this.events._id);
+            this.getPatientDetails(service._id,this.events._id);
           }
         },
-        error:()=>{
+        error:(err:any)=>{
           this.loader = false;
-          this.toster.showError("Failed to Change the patient Status","Failed!");
-          if(service){
-            this.getPatientDetails(service._id,this.events._id);
+          this.toster.showError("Failed to Change the patient Status",err.error.message);
+          if(this.userData.role !== 'Organizer'){
+            this.getAllPatientDetails(service._id);
           }else{
-            this.getAllPatientDetails(this.events._id);
+            this.getPatientDetails(service._id,this.events._id);
           }
         }
       }
@@ -510,6 +543,9 @@ export class OrganizerComponent implements OnInit, OnDestroy {
   }
 
   redirect(path:string){
+    if(path == 'login'){
+      this.auth.removeAuth();
+    }
     this.router.navigate([path]);
   }
 
@@ -521,7 +557,7 @@ export class OrganizerComponent implements OnInit, OnDestroy {
   }
 
   refresh(){
-
+    this.getDetails();
   }
 
   ngOnDestroy(): void {

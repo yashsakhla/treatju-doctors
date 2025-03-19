@@ -41,7 +41,7 @@ export class LoginComponent {
         this.rest.userData = res.userDetails;
         const name = res.userDetails.username ? res.userDetails.username : res.userDetails.name;
         this.toaster.showSuccess("You have successfully LoggedIn!","Hey,"+name);
-        this.auth.setAuth(res.access_token);
+        this.auth.setAuth(res.access_token, res.userDetails);
         switch (res.userDetails.role) {
           case 'Patient':
             this.router.navigate(['/user']);

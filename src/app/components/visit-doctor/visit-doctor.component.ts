@@ -65,7 +65,7 @@ export class VisitDoctorComponent {
       { title: 'Total Bookings', value: 0 },
       { title: 'Pending Bookings', value: 0},
       { title: 'Completed Bookings', value:0},
-      { title: 'Cancelled Bookings', value: 0 },
+      { title: 'Cancel Bookings', value: 0 },
       { title: 'Fee Collection', value: `₹${0}` },
       { 
         title: 'Admin Revenue (20%)', 
@@ -87,6 +87,7 @@ export class VisitDoctorComponent {
   loader!: boolean;
   visitDetails:any;
   isEditstaff: any;
+  isFirstLoad: boolean = true;
   
     constructor(private rest: RestService, private fb: FormBuilder, private auth :AuthService, private router:Router, private toster:TosterService) {
       this.visitDoctorForm = this.fb.group({
@@ -107,7 +108,7 @@ export class VisitDoctorComponent {
     }
   
     ngOnInit(): void {
-      this.loggedIn = this.auth.isUserLoggedIn;
+      this.loggedIn = this.auth.getAuth();
       this.userData = this.rest.userData;
       this.visitDoctor = this.userData;
       if(this.userData.role == 'VisitDoctor'){
@@ -125,11 +126,14 @@ export class VisitDoctorComponent {
         {
           next:(res:any)=>{
             if(res.length > 0){
-              this.visitDetails = res[0];
+            this.visitDetails = res[0];
             this.patchValue(this.visitDetails);
             this.staff = this.visitDetails.staff;
-            this.getAllPatientDetails(this.visitDetails._id);
-            this.updateDashboardData(this.staff);
+            this.loader = false;
+            if (this.isFirstLoad && this.visitDetails?._id) {
+              this.getAllPatientDetails(this.visitDetails._id);
+              this.isFirstLoad = false;
+            }
             }else{
               this.visitDetails = []
             }
@@ -138,31 +142,19 @@ export class VisitDoctorComponent {
       ) 
     }
     getAllPatientDetails(visitId?:any){
+      if(!this.visitDetails.visitName){return}
       this.loader = true;
       this.rest.getPatientList(this.visitDoctor._id,visitId).subscribe(
         {
           next:(res:any)=>{
             this.patients = res;
             this.loader = false;
+            if(this.userData.role == 'VisitDoctor'){
+              this.updateDashboardData(this.staff);
+            }
           },
-          error:()=>{
-            this.toster.showError("Error Fetching Patinets!","Please contact Admin!!")
-            this.loader = false;
-          }
-        }
-      )
-    }
-
-    getPatients(){
-      this.loader = true;
-      this.rest.getAllPatients().subscribe(
-        {
-          next:(res:any)=>{
-            this.patients = res;
-            this.loader = false;
-          },
-          error:()=>{
-            this.toster.showError("Error Fetching Patinets!","Please contact Admin!!")
+          error:(err:any)=>{
+            this.toster.showError(err.error.message,"No Patients Found!!")
             this.loader = false;
           }
         }
@@ -178,15 +170,15 @@ export class VisitDoctorComponent {
         } else if(item.title === 'Total Staff'){
           return { ...item, value: staff.length };
         }else if(item.title === 'Pending Bookings'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Pending').length };
+          return { ...item, value: this.patients.filter(p => p.bookEvents[0].status === 'Pending').length };
         }
         else if(item.title === 'Completed Bookings'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Completed').length };
+          return { ...item, value: this.patients.filter(p => p.bookEvents[0].status === 'Completed').length };
         }
         else if(item.title === 'Cancel Bookings'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Cancel').length };
+          return { ...item, value: this.patients.filter(p => p.bookEvents[0].status === 'Cancel').length };
         }else if(item.title === 'Admin Revenue (20%)'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Completed').length * this.visitDoctor.fee * 0.2 };
+          return { ...item, value: this.patients.filter(p => p.bookEvents[0].status === 'Completed').length * this.visitDetails.doctorFee * 0.2 };
         }
         return item;
       });
@@ -225,6 +217,7 @@ export class VisitDoctorComponent {
     }
   
     addStaff() {
+      if(!this.visitDetails.visitName){alert("please add your Visit First!!"); return}
       this.loader = true;
       const data = this.staffForm.value;
       data.role = "VisitDoctorStaff";
@@ -235,9 +228,9 @@ export class VisitDoctorComponent {
             this.toster.showSuccess("You have Successfully Added New Staff to your Visit!","Staff Added!!")
             this.getDetails();
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("There is error in adding your staff,Please contact admin","Error Adding Staff!")
+            this.toster.showError(err.error.message,"Error Adding Staff!")
           }
         }
         
@@ -250,13 +243,14 @@ export class VisitDoctorComponent {
           {
             next:(res:any)=>{
               if(res){
+                this.staffForm.reset();
                 this.getDetails();
                 this.toster.showSuccess("You have successfully Deleted your Staff!!","Deleted Successfully!")
               }
             },
-            error:()=>{
+            error:(err:any)=>{
               this.loader = false;
-              this.toster.showError("There is Error in Deleting this Staff, Please contact admin","Error In Deleting!!")
+              this.toster.showError(err.error.message,"Error In Deleting!!")
             }
           }
         )
@@ -276,9 +270,9 @@ export class VisitDoctorComponent {
               this.toster.showSuccess("You have Successfully updated your Visit","Visit Updated!!")
               this.getDetails();
             },
-            error:()=>{
+            error:(err:any)=>{
               this.loader = false;
-              this.toster.showError("Error in updating Visit, Please contact Admin","Visit updation Failed!!")
+              this.toster.showError(err.error.message,"Visit updation Failed!!")
             }
           }
         );
@@ -301,9 +295,9 @@ export class VisitDoctorComponent {
             this.toster.showSuccess("Successfully Changes the patient Status","Success!")
             this.getAllPatientDetails(this.visitDetails._id);
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Failed to Change the patient Status","Failed!");
+            this.toster.showError(err.error.message,"Failed!");
             this.getAllPatientDetails(this.visitDetails._id);
           }
         }
@@ -339,9 +333,9 @@ export class VisitDoctorComponent {
               this.toster.showSuccess("You have Successfully updated your Staff","Staff Updated!!")
               this.getDetails();
             },
-            error:()=>{
+            error:(err:any)=>{
               this.loader = false;
-              this.toster.showError("Error in updating Staff, Please contact Admin","Visit updation Failed!!")
+              this.toster.showError(err.error.message,"Visit updation Failed!!")
             }
           }
         );
@@ -358,12 +352,12 @@ export class VisitDoctorComponent {
             next:(res:any)=>{
               if(res){
                 this.getDetails();
-                this.toster.showSuccess("You have successfully Deleted your Visit!!","Deleted Successfully!")
+                this.toster.showSuccess("You have successfully Deleted your Visit!!","Deleted Successfully!");
               }
             },
-            error:()=>{
+            error:(err:any)=>{
               this.loader = false;
-              this.toster.showError("There is Error in Deleting this Visit, Please contact admin","Error In Deleting!!")
+              this.toster.showError(err.error.message,"Error In Deleting!!");
             }
           }
         )
@@ -391,9 +385,9 @@ export class VisitDoctorComponent {
               this.toster.showSuccess("You have Successfully added your Visit","Visit Added!!")
               this.getDetails();
             },
-            error:()=>{
+            error:(err:any)=>{
               this.loader = false;
-              this.toster.showError("Error in adding Visit, Please contact Admin","Visit Failed!!")
+              this.toster.showError(err.error.message,"Visit Failed!!");
             }
           }
         );
@@ -403,6 +397,9 @@ export class VisitDoctorComponent {
     }
     
   redirect(path:string){
+    if(path == 'login'){
+      this.auth.removeAuth();
+    }
     this.router.navigate([path]);
   }
 }

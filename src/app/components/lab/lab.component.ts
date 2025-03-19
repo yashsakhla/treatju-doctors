@@ -68,6 +68,7 @@ export class LabComponent implements OnInit {
   
     dashboardData = [
       { title: 'Total Staff', value: 0 },
+      { title: 'Total Services', value: 0 },
       { title: 'Total Bookings', value: 0 },
       { title: 'Pending Bookings', value: 0},
       { title: 'Completed Bookings', value:0},
@@ -90,6 +91,7 @@ export class LabComponent implements OnInit {
   isEditstaff: any;
   isEditService: any;
   showService: any;
+  isFirstLoad: boolean = true;
   
     constructor(private rest: RestService, private fb: FormBuilder, private auth :AuthService, private router:Router, private toster:TosterService) {
       this.visitlabForm = this.fb.group({
@@ -112,10 +114,9 @@ export class LabComponent implements OnInit {
     }
   
     ngOnInit(): void {
-      this.loggedIn = this.auth.isUserLoggedIn;
+      this.loggedIn = this.auth.getAuth();
       this.userData = this.rest.userData;
       this.lab = this.userData;
-      this.getAllPatientDetails(this.lab._id);
 
       if(this.userData.role == 'Lab'){
         this.show = 'dashboard'
@@ -137,9 +138,9 @@ export class LabComponent implements OnInit {
             this.patchLabvalue(this.lab);
             this.updateDashboardData(this.staff);
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Not Able to fetch Lab Details, Please Contact Admin","Error Fetching Lab!!")
+            this.toster.showError(err.error.message,"Error Fetching Lab!!")
           }
         }
       ) 
@@ -155,8 +156,8 @@ export class LabComponent implements OnInit {
             this.patients = res;
             this.loader = false;
           },
-          error:()=>{
-            this.toster.showError("Error Fetching Patinets!","Please contact Admin!!")
+          error:(err:any)=>{
+            this.toster.showError(err.error.message,"No patient Found!");
             this.loader = false;
           }
         }
@@ -170,9 +171,12 @@ export class LabComponent implements OnInit {
           next:(res:any)=>{
             this.patients = res;
             this.loader = false;
+            if(this.userData.role == 'Lab'){
+              this.updateDashboardData(this.staff);
+            }
           },
-          error:()=>{
-            this.toster.showError("Error Fetching Patinets!","Please contact Admin!!")
+          error:(err:any)=>{
+            this.toster.showError(err.error.message,"No patient Found!");
             this.loader = false;
           }
         }
@@ -187,24 +191,47 @@ export class LabComponent implements OnInit {
 
     updateDashboardData(staff:Staff[]) {
       // Update dashboard data
+      if (this.isFirstLoad && this.lab?._id) {
+        this.getAllPatientDetails(this.lab._id);
+        this.isFirstLoad = false;
+        return;
+      }
       this.dashboardData = this.dashboardData.map((item) => {
        if (item.title === 'Total Bookings') {
           return { ...item, value: this.patients.length }; // Assuming patients represent bookings
-        } else if(item.title === 'Total Staff'){
+        } else if(item.title === 'Total Services'){
+          return { ...item, value: this.lab.availableServices.length };
+        }else if(item.title === 'Total Staff'){
           return { ...item, value: staff.length };
+        }else if (item.title === 'Total Bookings') {
+          return { ...item, value: this.patients.length };
         }else if(item.title === 'Pending Bookings'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Pending').length };
+          return { ...item, value: this.patients.filter(p => p.bookEvents[0].status === 'Pending').length };
         }
         else if(item.title === 'Completed Bookings'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Completed').length };
+          return { ...item, value: this.patients.filter(p => p.bookEvents[0].status === 'Completed').length };
         }
         else if(item.title === 'Cancel Bookings'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Cancel').length };
+          return { ...item, value: this.patients.filter(p => p.bookEvents[0].status === 'Cancel').length };
         }else if(item.title === 'Admin Revenue (20%)'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Completed').length * this.lab.fee * 0.2 };
+          return { ...item, value: '₹'+ (this.updateRevenue() * 0.2).toFixed(2) };
         }
         return item;
       });
+    }
+
+    updateRevenue() {
+      const completedPatients = this.patients.filter(p => p.bookEvents[0].status === 'Completed');
+    
+          // Calculate total revenue based on service fees
+          let totalRevenue = completedPatients.reduce((acc, patient) => {
+            const serviceName = patient.bookEvents[0].serviceName; // Assuming service name exists in bookEvents
+            const service = this.serviceDetails.find(s => s.name === serviceName); // Find matching service
+            console.log(service);
+            const serviceFee = service ? service.fee : 0; // Get fee, default to 0 if not found
+            return acc + serviceFee;
+          }, 0);
+          return totalRevenue;
     }
 
     toggleActiveButton(selectedKey: string) {
@@ -270,9 +297,9 @@ export class LabComponent implements OnInit {
             this.getDetails();
             this.toster.showSuccess("Staff Added!","Your staff is added successfully for your Lab!!")
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Error Adding Staff!!","Adding Staff has failed, try again after sometime!")
+            this.toster.showError(err.error.message,"Adding Staff has failed, try again after sometime!")
           }
         }
         
@@ -289,9 +316,9 @@ export class LabComponent implements OnInit {
             this.getDetails();
             this.toster.showSuccess("Staff Deleted!","Your staff is deleted successfully for your Lab!!")
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Error deletinig Staff!!","deleting Staff has failed, try again after sometime!")
+            this.toster.showError(err.error.message,"deleting Staff has failed, try again after sometime!")
           }
         }
       )
@@ -331,7 +358,7 @@ export class LabComponent implements OnInit {
         bookingDate:res.bookEvents[0].bookingDate
       }
 
-      this.rest.patientStatus(res,'Labs',data).subscribe(
+      this.rest.patientStatus(res,'labs',data).subscribe(
         {
           next:(res:any)=>{
             this.loader = false;
@@ -373,7 +400,10 @@ export class LabComponent implements OnInit {
     updateStaff(){
       if(this.staffForm.valid){
       this.loader = true
-      const data = this.staffForm.value;
+      const data = {
+        name:this.staffForm.value.name,
+        address:this.staffForm.value.address
+      };
       this.rest.updateLabStaff(this.isEditstaff._id,data).subscribe(
         {
           next:()=>{
@@ -383,9 +413,9 @@ export class LabComponent implements OnInit {
             this.toster.showSuccess("Staff updated!!","your Lab Staff is Updated successfully!");
             this.isEditstaff = null;
           },
-          error:(err:Error)=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("updating Staff failed!!", err.message);
+            this.toster.showError(err.error.message,"updating Staff failed!!");
           }
         }
       )
@@ -404,9 +434,9 @@ export class LabComponent implements OnInit {
             this.getDetails();
             this.toster.showSuccess("Service Deleted!","Your Lab Service is deleted successfully for your Lab!!")
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Error deletinig service!!","deleting service has failed, try again after sometime!")
+            this.toster.showError(err.error.message,"deleting service has failed, try again after sometime!")
           }
         }
       )
@@ -441,9 +471,9 @@ export class LabComponent implements OnInit {
               this.toster.showSuccess("New Service Added!","Success");
               this.getDetails();
             },
-            error:(err:Error)=>{
+            error:(err:any)=>{
               this.loader = false;
-              this.toster.showError("Error Adding service",err.message);
+              this.toster.showError(err.error.message,"Error Adding service");
             }
           }
         );
@@ -453,6 +483,9 @@ export class LabComponent implements OnInit {
     }
     
   redirect(path:string){
+    if(path == 'login'){
+      this.auth.removeAuth();
+    }
     this.router.navigate([path]);
   }
 }

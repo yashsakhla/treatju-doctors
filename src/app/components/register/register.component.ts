@@ -122,9 +122,9 @@ export class RegisterComponent {
         this.toster.showSuccess("You have registered Successfully, Pleae Login now!","Registeration Done")
         this.router.navigate(['login']);
       },
-      error:(err:Error)=>{
+      error:(err:any)=>{
         this.loader = false;
-        this.toster.showError("Regisetration has failed, Please contact admin","Registeration Failed!")
+        this.toster.showError(err.error.message,"Registeration Failed!");
       }
     })
   }

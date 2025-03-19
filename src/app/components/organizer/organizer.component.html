@@ -13,7 +13,7 @@
            {{userData.role == 'Organizer'?'Organizer':userData.role == 'OrganizerDoctor'?'Organizer Doctor':'Organizer Staff'}}
         </div>
         <div class="no">
-          1232329823
+          {{userData.mobile}}
         </div>
       </div>
     </div>
@@ -224,7 +224,8 @@
   
         <!-- Doctor Form -->
         <div class="card mt-3 p-3" *ngIf="activeButton == 'doctors'">
-          <h4 class="fw-bold py-2">Add Doctors</h4>
+          <div class="d-flex justify-content-between align-items-center"><h4 class="fw-bold py-2">Add Doctors</h4>
+            <p class="mb-0 text-danger">( Please add the Event first then add doctor to that service)</p></div>
           <form [formGroup]="doctorForm">
             <div class="row">
               <div class="col-md-3">
@@ -524,7 +525,7 @@
           <tbody *ngIf="!(patients.length < 1)">
             <tr *ngFor="let patient of patients; let i = index">
               <td>{{ i + 1 }}</td>
-              <td>{{ patient.name }}</td>
+              <td>{{ patient.username }}</td>
               <td>{{ patient.gender }}</td>
               <td>{{ patient.email }}</td>
               <td>{{ patient.mobile }}</td>

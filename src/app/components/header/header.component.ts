@@ -42,7 +42,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.role = this.rest.userData.role;
-    this.loggedIn = this.auth.isUserLoggedIn;
+    this.loggedIn = this.auth.getAuth();
     setInterval(() => {
       this.nextSlide();
     }, 3000);
@@ -65,7 +65,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     document.addEventListener('click', (event: any) => {
       if (event.target && event.target.id === 'logoutBtn') {
-        this.redirect('/login');
+        
       } else if (event.target && event.target.id === 'loginBtn') {
         this.redirect('/login');
       }
@@ -90,6 +90,11 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         }
       });
     }
+  }
+
+  logout(){
+    this.auth.removeAuth();
+    window.location.reload();
   }
 
   togglePopover() {

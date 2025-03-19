@@ -46,5 +46,10 @@ export const routes: Routes = [
     {
         path:'hospital',
         component:HospitalComponent
+    },
+    {
+        path:'**',
+        component:PatientComponent
     }
+
 ];

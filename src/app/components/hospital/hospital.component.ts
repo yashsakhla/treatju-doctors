@@ -74,10 +74,12 @@ export class HospitalComponent implements OnInit {
   
     dashboardData = [
       { title: 'Total Staff', value: 0 },
+      { title: 'Total Services', value: 0 },
+      { title: 'Total Doctors', value: 0 },
       { title: 'Total Bookings', value: 0 },
       { title: 'Pending Bookings', value: 0},
       { title: 'Completed Bookings', value:0},
-      { title: 'Cancelled Bookings', value: 0 },
+      { title: 'Cancel Bookings', value: 0 },
       { title: 'Fee Collection', value: `₹${0}` },
       { 
         title: 'Admin Revenue (20%)', 
@@ -100,6 +102,7 @@ export class HospitalComponent implements OnInit {
     isEditDoctor:any;
   showDoctor: any;
   showService: any;
+  isFirstLoad: boolean = true;
   
     constructor(private rest: RestService, private fb: FormBuilder, private auth :AuthService, private router:Router, private toster:TosterService) {
       this.visithospitalForm = this.fb.group({
@@ -130,10 +133,10 @@ export class HospitalComponent implements OnInit {
     }
   
     ngOnInit(): void {
-      this.loggedIn = this.auth.isUserLoggedIn;
+      this.loggedIn = this.auth.getAuth();
       this.userData = this.rest.userData;
+      console.log(this.userData)
       this.hospital = this.userData;
-      this.getAllPatientDetails(this.hospital._id);
       if(this.userData.role == 'Hospital'){
         this.show = 'dashboard'
         this.getDetails();
@@ -144,7 +147,7 @@ export class HospitalComponent implements OnInit {
       }else if(this.userData.role == 'HospitalStaff'){
         this.showStaff = this.userData;
         this.show = this.showStaff.name;
-        this.getPatientDetails(this.hospital._id,this.showStaff._id);
+        this.getAllPatientDetails(this.showStaff._id);
       }
     }
 
@@ -167,12 +170,14 @@ export class HospitalComponent implements OnInit {
     }
 
     getPatientDetails(visitId:any, serviceId:any=''){
+      this.patients = [];
       this.loader = true;
       this.rest.getPatientList(visitId,serviceId).subscribe(
         {
           next:(res:any)=>{
             this.patients = res;
             this.loader = false;
+            this.updateDashboardData(this.staff);
           },
           error:()=>{
             this.toster.showError("Error Fetching Patinets!","Please contact Admin!!")
@@ -183,15 +188,19 @@ export class HospitalComponent implements OnInit {
     }
 
     getAllPatientDetails(visitId:any){
+      this.patients = []
       this.loader = true;
       this.rest.getAllPatients(visitId,'hospital').subscribe(
         {
           next:(res:any)=>{
             this.patients = res;
             this.loader = false;
+            if(this.userData.role == 'Hospital'){
+              this.updateDashboardData(this.staff);
+            }
           },
-          error:()=>{
-            this.toster.showError("Error Fetching Patinets!","Please contact Admin!!")
+          error:(err:any)=>{
+            this.toster.showError(err.error.message,"No Patients Found!!")
             this.loader = false;
             this.patients = [];
           }
@@ -201,26 +210,52 @@ export class HospitalComponent implements OnInit {
 
 
     updateDashboardData(staff:Staff[]) {
+      if (this.isFirstLoad && this.hospital?._id) {
+        this.getAllPatientDetails(this.hospital._id);
+        this.isFirstLoad = false;
+        return;
+      }
       // Update dashboard data
       this.dashboardData = this.dashboardData.map((item) => {
        if (item.title === 'Total Bookings') {
           return { ...item, value: this.patients.length }; // Assuming patients represent bookings
-        } else if(item.title === 'Total Staff'){
+        } else if(item.title === 'Total Services'){
+          return { ...item, value: this.serviceDetails.length };
+        }else if(item.title === 'Total Doctors'){
+          return { ...item, value: this.doctors.length };
+        }else if(item.title === 'Total Staff'){
           return { ...item, value: staff.length };
         }else if(item.title === 'Pending Bookings'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Pending').length };
+          return { ...item, value: this.patients.filter(p => p.bookEvents[0].status === 'Pending').length };
         }
         else if(item.title === 'Completed Bookings'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Completed').length };
+          return { ...item, value: this.patients.filter(p => p.bookEvents[0].status === 'Completed').length };
         }
         else if(item.title === 'Cancel Bookings'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Cancel').length };
+          return { ...item, value: this.patients.filter(p => p.bookEvents[0].status === 'Cancel').length };
+        }else if(item.title === 'Fee Collection'){
+          return { ...item, value: this.updateRevenue()}
         }else if(item.title === 'Admin Revenue (20%)'){
-          return { ...item, value: this.patients.filter(p => p.status === 'Completed').length * this.hospital.fee * 0.2 };
+          return { ...item, value: '₹'+  (this.updateRevenue() * 0.2).toFixed(2)}
         }
         return item;
       });
     }
+
+    updateRevenue() {
+      const completedPatients = this.patients.filter(p => p.bookEvents[0].status === 'Completed');
+    
+          // Calculate total revenue based on service fees
+          let totalRevenue = completedPatients.reduce((acc, patient) => {
+            const serviceName = patient.bookEvents[0].serviceName; // Assuming service name exists in bookEvents
+            const service = this.serviceDetails.find(s => s.name === serviceName); // Find matching service
+            console.log(service);
+            const serviceFee = service ? service.fee : 0; // Get fee, default to 0 if not found
+            return acc + serviceFee;
+          }, 0);
+          return totalRevenue;
+    }
+    
 
     toggleActiveButton(selectedKey: string) {
       this.activeButton = selectedKey;
@@ -251,6 +286,7 @@ export class HospitalComponent implements OnInit {
       this.show = path;
       if(data.role == "HospitalDoctor"){
         this.showDoctor = data;
+        this.getPatientDetails(this.hospital._id,data.serviceId);
       }else if(data.role == "HospitalStaff"){
         this.showStaff = data;
         this.getAllPatientDetails(this.hospital._id);
@@ -277,22 +313,29 @@ export class HospitalComponent implements OnInit {
       )
     }
 
+    findId(name:string){
+      return this.serviceDetails.find(item => item.name === name)?._id;
+    }
+
     addDoctor() {
       console.log(this.doctorForm.value)
       if (this.doctorForm.valid) {
         this.loader = true;
         const data = this.doctorForm.value;
         data.mobile = Number(data.mobile);
+        data.serviceId = this.findId(data.service);
+        data.role = "HospitalDoctor"
         this.rest.addHospitalDoctor(data).subscribe( {
           next:(res:any)=>{
             if(res){
+              this.doctorForm.reset();
               this.getDetails();
               this.toster.showSuccess("Doctor Added to Hospital Successfully!","Doctor Added!!")
             }
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Failed to Add Doctor to Hospital, Check with Admin.","Failed to Add Doctor!")
+            this.toster.showError(err.error.message,"Failed to Add Doctor!")
           }
         })
       }else{
@@ -306,8 +349,10 @@ export class HospitalComponent implements OnInit {
         const data:any = {
           name:this.doctorForm.value.name,
           address:this.doctorForm.value.address,
+          service:this.doctorForm.value.service,
+          serviceId:this.findId(this.doctorForm.value.service)
         };
-        this.rest.updateHospitalDoctor(data, this.hospital._id ).subscribe( {
+        this.rest.updateHospitalDoctor(this.isEditDoctor._id,data ).subscribe( {
           next:(res:any)=>{
             if(res){
               this.isEditDoctor = null;
@@ -316,9 +361,9 @@ export class HospitalComponent implements OnInit {
               this.toster.showSuccess("Doctor Changes Are edited Successfully!","Edited Successfully!");
             }
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Error Editing Doctor Changes, Please contact admin.","Error Editing Doctor!")
+            this.toster.showError(err.error.message,"Error Editing Doctor!")
           }
         })
       }else{
@@ -328,16 +373,16 @@ export class HospitalComponent implements OnInit {
 
     deleteDoctor(doctor:any) {
       this.loader = true;
-      this.rest.deleteDoctor(doctor._id,this.hospital._id).subscribe({
+      this.rest.deleteHospitalDoctor(doctor._id).subscribe({
         next:(res:any)=>{
           this.isEditDoctor = null;
           this.doctorForm.reset();
           this.getDetails();
           this.toster.showSuccess("Doctor is deleted Successfully!","Deleted Successfully!");
         },
-        error:()=>{
+        error:(err:any)=>{
           this.loader = false;
-          this.toster.showError("Error Deleting Doctor Changes, Please contact admin.","Error Deleting Doctor!")
+          this.toster.showError(err.error.message,"Error Deleting Doctor!")
         }
       })
     }
@@ -369,9 +414,9 @@ export class HospitalComponent implements OnInit {
             this.getDetails();
             this.toster.showSuccess("Staff Added!","Your staff is added successfully for your hospital!!")
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Error Adding Staff!!","Adding Staff has failed, try again after sometime!")
+            this.toster.showError(err.error.message,"Adding Staff has failed!")
           }
         }
         
@@ -388,9 +433,9 @@ export class HospitalComponent implements OnInit {
             this.getDetails();
             this.toster.showSuccess("Staff Deleted!","Your staff is deleted successfully for your hospital!!")
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Error deletinig Staff!!","deleting Staff has failed, try again after sometime!")
+            this.toster.showError(err.error.message,"deleting Staff has failed!")
           }
         }
       )
@@ -399,7 +444,6 @@ export class HospitalComponent implements OnInit {
     updatehospitalService(){
       if(this.visithospitalForm.valid){
         const data = this.visithospitalForm.value;
-        data.serviceId = this.serviceDetails.find((res:any)=> res.name == data.service)._id;
       this.loader = true;
       this.rest.updatehospitalService(this.isEditService._id,data).subscribe(
         {
@@ -409,9 +453,9 @@ export class HospitalComponent implements OnInit {
             this.getDetails();
             this.toster.showSuccess("Service updated!!","your hospital Service is Updated successfully!")
           },
-          error:(err:Error)=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("updating Service failed!!", err.message);
+            this.toster.showError(err.error.message,"updating Service failed!!");
           }
         }
       )
@@ -439,9 +483,9 @@ export class HospitalComponent implements OnInit {
               this.getAllPatientDetails(this.hospital._id);
             }
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Failed to Change the patient Status","Failed!");
+            this.toster.showError(err.error.message,"Failed to Update the Status!");
             if(service){
               this.getPatientDetails(this.hospital._id,service._id);
             }else{
@@ -468,7 +512,10 @@ export class HospitalComponent implements OnInit {
 
     updateStaff(){
       this.loader = true;
-      const data = this.staffForm.value;
+      const data = {
+        mobile:this.staffForm.value.mobile,
+        address:this.staffForm.value.address
+      };
       this.rest.updateHospitalStaff(this.hospital._id, this.isEditstaff._id,data).subscribe(
         {
           next:()=>{
@@ -477,9 +524,9 @@ export class HospitalComponent implements OnInit {
             this.getDetails();
             this.toster.showSuccess("Staff updated!!","your hospital Staff is Updated successfully!")
           },
-          error:(err:Error)=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("updating Staff failed!!", err.message);
+            this.toster.showError(err.error.message,"updating Staff failed!!");
           }
         }
       )
@@ -495,9 +542,9 @@ export class HospitalComponent implements OnInit {
             this.getDetails();
             this.toster.showSuccess("Service Deleted!","Your hospital Service is deleted successfully for your hospital!!")
           },
-          error:()=>{
+          error:(err:any)=>{
             this.loader = false;
-            this.toster.showError("Error deletinig service!!","deleting service has failed, try again after sometime!")
+            this.toster.showError(err.error.message,"Error deletinig service!!")
           }
         }
       )
@@ -530,9 +577,9 @@ export class HospitalComponent implements OnInit {
               this.toster.showSuccess("New Service Added!","Success");
               this.getDetails();
             },
-            error:(err:Error)=>{
+            error:(err:any)=>{
               this.loader = false;
-              this.toster.showError("Error Adding service",err.message);
+              this.toster.showError(err.error.message,"Error Adding service");
             }
           }
         );
@@ -542,6 +589,9 @@ export class HospitalComponent implements OnInit {
     }
     
   redirect(path:string){
+    if(path == 'login'){
+      this.auth.removeAuth();
+    }
     this.router.navigate([path]);
   }
 }

@@ -16,12 +16,17 @@ export class RestService {
   showLoader = this.loader.asObservable();
 
 
-  userData:any;
+  userData:any = localStorage.getItem('userData') ? this.returnParse() : null;
   selectedCity!:string;
 
   apiUrl = 'http://localhost:3000/users'; 
 
   eventObject:any;
+
+  returnParse(){
+    const data:any = localStorage.getItem('userData');
+    return JSON.parse(data);
+  }
 
   checkCityEvent(city:string){
     this.loader.next(true);
@@ -102,7 +107,7 @@ export class RestService {
   }
 
   updateVisitDocStaff(vistId:any,staffId:any, staff:any){
-    return this.http.put(`${api_url }visit-doctor/${vistId}/staff/${staffId}`,staff)
+    return this.http.put(`${api_url }visit-doctor/${vistId}/staff/${staffId}/update`,staff)
   }
 
   deleteVisitDoc(vistId:any){
@@ -142,7 +147,7 @@ export class RestService {
   }
 
   deleteLabService(serviceId:any){
-    return this.http.delete(`${api_url}labs/delete-available-services/${serviceId}`);
+    return this.http.delete(`${api_url}labs/delete-available-service/${serviceId}`);
   }
 
   addLabStaff(payload:any){
@@ -170,11 +175,11 @@ export class RestService {
   }
 
   updatehospitalService(serviceId:any,payload:any){
-    return this.http.post(`${api_url}hospital/update-available-services`, payload);
+    return this.http.put(`${api_url}hospital/update-available-service/${serviceId}`, payload);
   }
 
   deleteHospitalService(serviceId:any){
-    return this.http.delete(`${api_url}hospital/delete-available-services/${serviceId}`);
+    return this.http.delete(`${api_url}hospital/delete-available-service/${serviceId}`);
   }
 
   addHospitalStaff(payload:any,labId:any){
@@ -182,7 +187,7 @@ export class RestService {
   }
 
   updateHospitalStaff(labId:any,staffId:any, payload:any){
-    return this.http.put(`${api_url}hospital/create-staff/${staffId}`, payload);
+    return this.http.put(`${api_url}hospital/edit-staff/${staffId}`, payload);
   }
 
   deleteHospitalStaff(labId:any,staffId:any){
@@ -221,6 +226,10 @@ export class RestService {
     }else{
       return this.http.get(`${api_url}patient/get-all-patients/${providerId}`);
     }
+   }
+
+   getAllservicePatients(serviceId:any){
+    return this.http.get(`${api_url}patient/get-organizer-patients/${serviceId}`);
    }
 
    patientStatus(patient:any,isFor:any,payload:any){

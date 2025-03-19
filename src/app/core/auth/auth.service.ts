@@ -9,16 +9,18 @@ export class AuthService {
 
   isUserLoggedIn:boolean = false;
 
-  setAuth(token:string){
+  setAuth(token:string, userData:any){
     localStorage.setItem('token',token);
+    localStorage.setItem('userData', JSON.stringify(userData))
   }
 
   getAuth(){
     const token = localStorage.getItem('token');
-    return token;
+    return token ? true : false;
   }
 
   removeAuth(){
     localStorage.removeItem('token');
+    localStorage.removeItem('userData');
   }
 }

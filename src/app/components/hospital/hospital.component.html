@@ -362,10 +362,11 @@
               <div class="col-md-6">
                 <label class="form-label">Per Patient Fee</label>
                 <input
-                  type="text"
+                  type="number"
                   class="form-control"
                   formControlName="fee"
                   placeholder="Enter fee"
+                  min="1"
                   required
                 />
               </div>
@@ -576,7 +577,7 @@
           <tbody *ngIf="patients">
             <tr *ngFor="let patient of patients; let i = index">
               <td>{{ i + 1 }}</td>
-              <td>{{ patient.name }}</td>
+              <td>{{ patient.username }}</td>
               <td>{{ patient.gender }}</td>
               <td>{{ patient.email }}</td>
               <td>{{ patient.mobile }}</td>
@@ -659,7 +660,7 @@
           <tbody *ngIf="patients">
             <tr *ngFor="let patient of patients; let i = index">
               <td>{{ i + 1 }}</td>
-              <td>{{ patient.name }}</td>
+              <td>{{ patient.username }}</td>
               <td>{{ patient.gender }}</td>
               <td>{{ patient.email }}</td>
               <td>{{ patient.mobile }}</td>
@@ -715,7 +716,7 @@
           <tbody *ngIf="patients">
             <tr *ngFor="let patient of patients; let i = index">
               <td>{{ i + 1 }}</td>
-              <td>{{ patient.name }}</td>
+              <td>{{ patient.username }}</td>
               <td>{{ patient.gender }}</td>
               <td>{{ patient.email }}</td>
               <td>{{ patient.mobile }}</td>
