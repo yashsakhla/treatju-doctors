@@ -266,6 +266,7 @@ export class LabComponent implements OnInit {
       this.rest.addLabStaff(data).subscribe(
         {
           next:()=>{
+            this.staffForm.reset();
             this.getDetails();
             this.toster.showSuccess("Staff Added!","Your staff is added successfully for your Lab!!")
           },
@@ -436,6 +437,7 @@ export class LabComponent implements OnInit {
         this.rest.addlabService(data).subscribe(
           {
             next:(res:any)=>{
+              this.visitlabForm.reset();
               this.toster.showSuccess("New Service Added!","Success");
               this.getDetails();
             },

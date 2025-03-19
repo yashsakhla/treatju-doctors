@@ -142,14 +142,20 @@ export class OrganizerComponent implements OnInit, OnDestroy {
     if(this.userData.role == 'Organizer'){
       this.show = 'dashboard';
       this.getDetails();
+      this.getAllPatientDetails(this.events._id);
     }else if(this.userData.role == 'OrganizerDoctor'){
       this.showDoctor = this.userData;
       this.show = this.showDoctor.name;
-      this.getAllPatientDetails();
+      this.getAllPatientDetails(this.showDoctor._id);
     }else if(this.userData.role == 'OrganizerStaff'){
       this.showStaff = this.userData;
       this.getAllPatientDetails();
     }
+  }
+
+  getIsoString(date:any){
+    const istOffset = 6.5 * 60 * 60 * 1000;
+    return new Date(date).getTime() + istOffset;
   }
 
   getDetails(){
@@ -164,7 +170,6 @@ export class OrganizerComponent implements OnInit, OnDestroy {
             this.doctors = this.events.doctors;
             this.staff = this.events.staff;
             this.loader = false;
-            this.getAllPatientDetails(this.events._id);
             if(this.doctors.length > 0 || this.staff.length > 0){
               this.updateDashboardData(this.doctors,this.staff);
             }
@@ -180,11 +185,12 @@ export class OrganizerComponent implements OnInit, OnDestroy {
 
   getPatientDetails(visitId:any, serviceId:any=''){
     this.loader = true;
+    this.patients = [];
     this.rest.getPatientList(visitId,serviceId).subscribe(
       {
         next:(res:any)=>{
-          this.patients = res;
           this.loader = false;
+          this.patients = res;
         },
         error:()=>{
           this.toster.showError("Error Fetching Patinets!","Please contact Admin!!")
@@ -196,6 +202,7 @@ export class OrganizerComponent implements OnInit, OnDestroy {
 
   getAllPatientDetails(visitId?:any){
     this.loader = true;
+    this.patients = [];
     this.rest.getAllPatients(visitId,'organizer').subscribe(
       {
         next:(res:any)=>{
@@ -211,29 +218,24 @@ export class OrganizerComponent implements OnInit, OnDestroy {
   }
 
   updateDashboardData(doctor:Doctor[], staff:Staff[]) {
-
     // Flatten all patient arrays from doctors into one array
-    const allPatients = doctor.reduce<any[]>((acc, doc) => {
-      return acc.concat(doc.patient || []); // Ensure `patients` exists
-    }, []);
-    this.patients = allPatients;
   
     // Update dashboard data
     this.dashboardData = this.dashboardData.map((item) => {
       if (item.title === 'Total Doctors') {
         return { ...item, value: doctor.length };
       } else if (item.title === 'Total Bookings') {
-        return { ...item, value: allPatients.length }; // Assuming patients represent bookings
+        return { ...item, value: this.patients.length }; // Assuming patients represent bookings
       } else if(item.title === 'Total Staff'){
         return { ...item, value: staff.length };
       }else if(item.title === 'Pending Bookings'){
-        return { ...item, value: allPatients.filter(p => p.status === 'Pending').length };
+        return { ...item, value: this.patients.filter((p:any)=> p.status === 'Pending').length };
       }
       else if(item.title === 'Completed Bookings'){
-        return { ...item, value: allPatients.filter(p => p.status === 'Completed').length };
+        return { ...item, value: this.patients.filter((p:any) => p.status === 'Completed').length };
       }
       else if(item.title === 'Cancel Bookings'){
-        return { ...item, value: allPatients.filter(p => p.status === 'Cancel').length };
+        return { ...item, value: this.patients.filter((p:any) => p.status === 'Cancel').length };
       }
       return item;
     });
@@ -262,9 +264,9 @@ export class OrganizerComponent implements OnInit, OnDestroy {
 
   showContent(path: string, isdDoctor?:any) {
     this.show = path;
-    if(isdDoctor.role = 'organizerDoctor'){
+    if(isdDoctor.role === 'OrganizerDoctor'){
       this.showDoctor = isdDoctor;
-      this.getPatientDetails(this.events._id,this.showDoctor._id);
+      this.getPatientDetails(this.showDoctor._id,this.events._id);
     }else{
       this.showStaff = isdDoctor;
       this.getAllPatientDetails(this.events._id);
@@ -294,6 +296,7 @@ export class OrganizerComponent implements OnInit, OnDestroy {
       address: [staff.address, Validators.required],
       mobile: [staff.mobile, [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       password: [staff.password, Validators.required],
+      role:['OrganizerStaff']
     });
   }
 
@@ -397,6 +400,7 @@ export class OrganizerComponent implements OnInit, OnDestroy {
     if (this.staffForm.valid) {
       this.loader = true;
       const data = this.staffForm.value
+      data.role = 'OrganizerStaff'
       this.rest.addEventStaff(data,this.events._id).subscribe(
         {
           next:(res:any)=>{
@@ -483,7 +487,7 @@ export class OrganizerComponent implements OnInit, OnDestroy {
           this.loader = false;
           this.toster.showSuccess("Successfully Changes the patient Status","Success!")
           if(service){
-            this.getPatientDetails(this.events._id,service._id);
+            this.getPatientDetails(service._id,this.events._id);
           }else{
             this.getAllPatientDetails(this.events._id);
           }
@@ -492,7 +496,7 @@ export class OrganizerComponent implements OnInit, OnDestroy {
           this.loader = false;
           this.toster.showError("Failed to Change the patient Status","Failed!");
           if(service){
-            this.getPatientDetails(this.events._id,service._id);
+            this.getPatientDetails(service._id,this.events._id);
           }else{
             this.getAllPatientDetails(this.events._id);
           }

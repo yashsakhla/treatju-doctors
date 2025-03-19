@@ -138,7 +138,7 @@ export class RestService {
   }
 
   updatelabService(service:any,payload:any){
-    return this.http.put(`${api_url}labs/update-available-services/${service.name}`, payload);
+    return this.http.put(`${api_url}labs/update-available-service/${service._id}`, payload);
   }
 
   deleteLabService(serviceId:any){
@@ -194,7 +194,7 @@ export class RestService {
   }
 
   updateHospitalDoctor(doctorId:any,payload:any){
-    return this.http.put(`${api_url}hospital/create-doctor/${doctorId}`, payload);
+    return this.http.put(`${api_url}hospital/edit-doctor/${doctorId}`, payload);
   }
 
   deleteHospitalDoctor(doctorId:any){
@@ -215,7 +215,7 @@ export class RestService {
   }
 
   getAllPatients(providerId?:any,isFor?:string){
-    const allowedRoles = ['OrganizerStaff', 'OrganizerDoctor', 'VisitDoctorStaff', 'LabStaff', 'HospitalStaff','HospitalDoctor'];
+    const allowedRoles = ['OrganizerStaff', 'VisitDoctorStaff', 'LabStaff', 'HospitalStaff'];
     if(allowedRoles.includes(this.userData.role)){
       return this.http.get(`${api_url+isFor}/get-all-patients`);
     }else{

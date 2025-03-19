@@ -231,6 +231,7 @@ export class VisitDoctorComponent {
       this.rest.addVisitDocStaff(data,this.visitDetails).subscribe(
         {
           next:()=>{
+            this.staffForm.reset();
             this.toster.showSuccess("You have Successfully Added New Staff to your Visit!","Staff Added!!")
             this.getDetails();
           },
@@ -271,6 +272,7 @@ export class VisitDoctorComponent {
         this.rest.updateVisitDoctor(this.visitDetails._id,data).subscribe(
           {
             next:(res:any)=>{
+              
               this.toster.showSuccess("You have Successfully updated your Visit","Visit Updated!!")
               this.getDetails();
             },

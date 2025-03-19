@@ -143,6 +143,7 @@ export class HospitalComponent implements OnInit {
         this.getPatientDetails(this.hospital._id,this.showDoctor._id);
       }else if(this.userData.role == 'HospitalStaff'){
         this.showStaff = this.userData;
+        this.show = this.showStaff.name;
         this.getPatientDetails(this.hospital._id,this.showStaff._id);
       }
     }
@@ -302,7 +303,7 @@ export class HospitalComponent implements OnInit {
     editDoctor() {
       if (this.doctorForm.valid) {
         this.loader = true;
-        const data = {
+        const data:any = {
           name:this.doctorForm.value.name,
           address:this.doctorForm.value.address,
         };
@@ -364,6 +365,7 @@ export class HospitalComponent implements OnInit {
       this.rest.addHospitalStaff(data,this.hospital._id).subscribe(
         {
           next:()=>{
+            this.staffForm.reset();
             this.getDetails();
             this.toster.showSuccess("Staff Added!","Your staff is added successfully for your hospital!!")
           },
@@ -397,6 +399,7 @@ export class HospitalComponent implements OnInit {
     updatehospitalService(){
       if(this.visithospitalForm.valid){
         const data = this.visithospitalForm.value;
+        data.serviceId = this.serviceDetails.find((res:any)=> res.name == data.service)._id;
       this.loader = true;
       this.rest.updatehospitalService(this.isEditService._id,data).subscribe(
         {
