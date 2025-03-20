@@ -6,8 +6,10 @@
         <div class="col-md-3">
           <h5>Quick Links</h5>
           <ul class="list-unstyled">
-            <li><a href="#" class="text-dark text-decoration-none">Login</a></li>
-            <li><a href="#" class="text-dark text-decoration-none">Registration</a></li>
+            <li><a href="#" class="text-dark text-decoration-none" (click)="redirect('login')">{{isUserLoggedIn ? 'Logout':'Login'}}</a></li>
+            <li><a href="#" class="text-dark text-decoration-none" (click)="redirect('register')" *ngIf="!isUserLoggedIn">Register</a></li>
+            <li><a href="#" class="text-dark text-decoration-none">Admin</a></li>
+            <li><a href="#" class="text-dark text-decoration-none">About Us</a></li>
           </ul>
         </div>
   

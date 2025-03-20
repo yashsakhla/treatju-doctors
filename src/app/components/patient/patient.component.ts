@@ -142,9 +142,9 @@ export class PatientComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const currentDate = new Date();
     this.today = currentDate.toISOString().split('T')[0];
-    this.isUserLoggedin = this.auth.isUserLoggedIn;
+    this.isUserLoggedin = this.auth.getAuth();
     this.userData = this.rest.userData;
-    if(this.isUserLoggedin){
+    if(this.isUserLoggedin && this.userData.role == 'Patient'){
       this.getUserDetails();
     }
   }

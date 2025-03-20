@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../core/auth/auth.service';
+import { Router } from '@angular/router';
+import { retry } from 'rxjs';
 
 @Component({
   selector: 'app-footer',
@@ -7,6 +10,18 @@ import { Component } from '@angular/core';
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss'
 })
-export class FooterComponent {
+export class FooterComponent implements OnInit {
+  constructor(private auth:AuthService, private router:Router){}
+  isUserLoggedIn!:boolean;
+  ngOnInit(): void {
+    this.isUserLoggedIn = this.auth.getAuth()
+  }
 
+  redirect(path:string){
+    if(this.isUserLoggedIn){
+      this.auth.removeAuth();
+      return;
+    }
+    this.router.navigate([path]);
+  }
 }

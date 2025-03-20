@@ -561,6 +561,6 @@ export class OrganizerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.auth.removeAuth();
+   
   }
 }
