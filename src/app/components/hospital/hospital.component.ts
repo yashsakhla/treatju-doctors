@@ -53,16 +53,16 @@ export class HospitalComponent implements OnInit {
         key:"hospital"
       },
       {
-        name:"Doctors",
-        active:false,
-        notification:0,
-        key:"doctors"
-      },
-      {
         name:"services",
         active:false,
         notification:0,
         key:"services"
+      },
+      {
+        name:"Doctors",
+        active:false,
+        notification:0,
+        key:"doctors"
       },
       {
         name:"Staff",
