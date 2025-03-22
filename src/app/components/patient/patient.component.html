@@ -49,9 +49,9 @@
                       <!-- Booking Column -->
                       <td class="text-sm py-3 px-2 text-right" style="text-align: right;">
                         <button type="button" class="btn btn-dark btn-sm px-3 py-2"
-                          [disabled]="isBtnDisabled(data)" 
+                          [disabled]="isBtnDisabled(doc)" 
                           (click)="bookCamp(data, doc)" *ngIf="isUserLoggedin">
-                          <i class="bi bi-calendar-check"></i> {{isBtnDisabled(data) ? 'Already Booked' : 'Book' }}
+                          <i class="bi bi-calendar-check"></i> {{isBtnDisabled(doc) ? 'Already Booked' : 'Book' }}
                         </button>
                         <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin || userData.role !== 'Patient'" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
                       </td>
@@ -170,7 +170,7 @@
         </select>        
 
         <label class="form-label fw-semibold mb-1 pt-2" >Select Date</label>
-        <input class="form-control" type="datetime-local" [min]="today" [(ngModel)]="selectedDate">
+        <input class="form-control" type="date" [min]="today" [(ngModel)]="selectedDate">
       </div>
 
       <!-- Modal Footer -->

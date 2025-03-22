@@ -246,7 +246,7 @@ export class PatientComponent implements OnInit, OnDestroy {
   }
 
   isBtnDisabled(data:any){
-    return this.userData.bookEvents.some((item:any) => data?.eventName ? item.serviceId == data._id : item.providerId == data._id);
+    return this.userData.bookEvents.find((item:any) => item.providerId == data._id);
   }
 
   redirect(path:string){
