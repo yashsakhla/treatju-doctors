@@ -249,6 +249,11 @@ export class PatientComponent implements OnInit, OnDestroy {
     return this.userData.bookEvents.find((item:any) => item.providerId == data._id);
   }
 
+  booking(data:any){
+    const event:any = this.userData.bookEvents.filter((item:any) => item.providerId == data._id);
+    return event[0];
+  }
+
   redirect(path:string){
     this.router.navigate([path]);
   }

@@ -168,12 +168,13 @@
           <form [formGroup]="hospitalForm">
             <!-- Second Row: Time From & Time To -->
             <div class="row mb-3">
+              <h3>Shift One</h3>
               <div class="col-md-6">
                 <label class="form-label">Time From</label>
                 <input
                   type="time"
                   class="form-control"
-                  formControlName="startTime"
+                  formControlName="shiftOneStartTime"
                   required
                 />
               </div>
@@ -182,7 +183,28 @@
                 <input
                   type="time"
                   class="form-control"
-                  formControlName="endTime"
+                  formControlName="shiftOneEndTime"
+                  required
+                />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <h3>Shift Two</h3>
+              <div class="col-md-6">
+                <label class="form-label">Time From</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  formControlName="shiftTwoStartTime"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Time To</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  formControlName="shiftTwoEndTime"
                   required
                 />
               </div>
@@ -193,7 +215,7 @@
               type="submit"
               class="btn btn-dark"
               (click)="updateSchedule()"
-              *ngIf="!hospital.startTime"
+              *ngIf="!hospital.shiftOneStartTime"
             >
               Add Schedule
             </button>
@@ -201,7 +223,7 @@
               type="submit"
               class="btn btn-dark"
               (click)="updateSchedule()"
-              *ngIf="hospital.startTime"
+              *ngIf="hospital.shiftOneStartTime"
             >
               Update Schedule
             </button>

@@ -7,6 +7,7 @@ import { OrganizerComponent } from './components/organizer/organizer.component';
 import { VisitDoctorComponent } from './components/visit-doctor/visit-doctor.component';
 import { LabComponent } from './components/lab/lab.component';
 import { HospitalComponent } from './components/hospital/hospital.component';
+import { InfoComponent } from './components/info/info.component';
 
 
 export const routes: Routes = [
@@ -46,6 +47,10 @@ export const routes: Routes = [
     {
         path:'hospital',
         component:HospitalComponent
+    },
+    {
+        path:'info/:type',
+        component:InfoComponent
     },
     {
         path:'**',

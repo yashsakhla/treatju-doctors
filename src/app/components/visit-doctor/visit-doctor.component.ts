@@ -14,6 +14,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { TosterService } from '../../core/toster/toster.service';
 import { LoaderComponent } from '../loader/loader.component';
+import { CityDropdownComponent } from '../city-dropdown/city-dropdown.component';
 
 interface Staff {
   name: string;
@@ -25,7 +26,7 @@ interface Staff {
 @Component({
   selector: 'app-visit-doctor',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, EventFormComponentComponent, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule, EventFormComponentComponent, LoaderComponent, CityDropdownComponent],
   templateUrl: './visit-doctor.component.html',
   styleUrl: './visit-doctor.component.scss'
 })
@@ -96,7 +97,8 @@ export class VisitDoctorComponent {
         eventDate: ['', Validators.required],  // ✅ Single Date Field
         startTime: ['', Validators.required],
         endTime: ['', Validators.required],
-        doctorFee: ['', [Validators.required]]
+        doctorFee: ['', [Validators.required]],
+        city:['',[Validators.required]]
       });
 
       this.staffForm = this.fb.group({
@@ -184,6 +186,13 @@ export class VisitDoctorComponent {
       });
     }
 
+    
+  handleCitySelection(city: string) {
+    this.visitDoctorForm.get('city')?.setValue(
+      city
+    );
+  }
+
     toggleActiveButton(selectedKey: string) {
       this.activeButton = selectedKey;
       this.buttons.forEach(button => {
@@ -197,7 +206,8 @@ export class VisitDoctorComponent {
         eventDate: [new Date(events.eventDate).toISOString().split('T')[0], Validators.required],  // ✅ Single Date Field
         startTime: [this.isoToTimeString(events.startTime), Validators.required],
         endTime: [this.isoToTimeString(events.endTime), Validators.required],
-        doctorFee: [events.doctorFee, [Validators.required, Validators.min(1)]]
+        doctorFee: [events.doctorFee, [Validators.required, Validators.min(1)]],
+        city:[events.city,[Validators.required]]
       });
     }
 

@@ -100,8 +100,10 @@ export class LabComponent implements OnInit {
       });
 
       this.labForm = this.fb.group({
-        startTime: ['', Validators.required],
-        endTime: ['', [Validators.required]]
+        shiftOneStartTime: ['', Validators.required],
+        shiftOneEndTime: ['', [Validators.required]],
+        shiftTwoStartTime: [''],
+        shiftTwoEndTime: [''],
       });
 
       this.staffForm = this.fb.group({
@@ -250,8 +252,10 @@ export class LabComponent implements OnInit {
 
     patchLabvalue(lab:any){
       this.labForm = this.fb.group({
-        startTime: [lab.startTime, Validators.required],
-        endTime: [lab.endTime, [Validators.required]]
+        shiftOneStartTime: [lab.shiftOneStartTime, Validators.required],
+        shiftOneEndTime: [lab.shiftOneEndTime, [Validators.required]],
+        shiftTwoStartTime: [lab.shiftTwoStartTime],
+        shiftTwoEndTime: [lab.shiftTwoEndTime],
       });
     }
   

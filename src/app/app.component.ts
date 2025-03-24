@@ -25,7 +25,7 @@ export class AppComponent implements OnInit{
     this.aRouter.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
-      if(event.url === "/user" || event.url == '/'){
+      if(event.url === "/user" || event.url == '/' || event.url == '/info/aboutUs' || event.url == '/info/tnc' || event.url == '/info/privacy'){
         this.showHeader = true;
         this.showFooter = true;
       }else{

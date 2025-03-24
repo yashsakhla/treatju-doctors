@@ -14,6 +14,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { TosterService } from '../../core/toster/toster.service';
 import { LoaderComponent } from '../loader/loader.component';
+import { CityDropdownComponent } from '../city-dropdown/city-dropdown.component';
 
 interface Event {
   _id:string,
@@ -23,7 +24,8 @@ interface Event {
   startTime: string;
   endTime: string;
   doctors:Doctor[],
-  staff:Staff[]
+  staff:Staff[],
+  city:string;
 }
 
 interface Doctor {
@@ -46,7 +48,7 @@ interface Staff {
 @Component({
   selector: 'app-organizer',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, EventFormComponentComponent, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule, EventFormComponentComponent, LoaderComponent, CityDropdownComponent],
   templateUrl: './organizer.component.html',
   styleUrl: './organizer.component.scss',
 })
@@ -118,6 +120,7 @@ export class OrganizerComponent implements OnInit, OnDestroy {
       eventDate: ['', Validators.required],
       startTime: ['', Validators.required],
       endTime: ['', Validators.required],
+      city: ['', Validators.required],
     });
 
     this.doctorForm = this.fb.group({
@@ -260,6 +263,7 @@ export class OrganizerComponent implements OnInit, OnDestroy {
       eventName: [events.eventName, Validators.required],
       eventPlace: [events.eventPlace, Validators.required],
       eventDate: [new Date(events.eventDate).toISOString().split('T')[0], Validators.required],
+      city: [events.city, Validators.required],
       startTime: [this.isoToTimeString(events.startTime), Validators.required],
       endTime: [this.isoToTimeString(events.endTime), Validators.required],
     });
@@ -506,6 +510,19 @@ export class OrganizerComponent implements OnInit, OnDestroy {
     })
   }
 
+  deleteEvent(event:any){
+    this.loader = true;
+    this.rest.deleteEvent(event._id).subscribe({
+      next:(res:any)=>{
+        this.getDetails();
+        this.toster.showSuccess("Event is Deleted Successfully!","Deleted Successfully!");
+      },
+      error:(err:any)=>{
+        this.loader = false;
+        this.toster.showError("Error Deleting Event!",err.error.message);
+      }
+    })
+  }
   // Toggle Status (Pending <-> Complete)
   toggleStatus(res:any,status:string, service?:any) {
     this.loader = true;
@@ -536,6 +553,12 @@ export class OrganizerComponent implements OnInit, OnDestroy {
         }
       }
     )
+  }
+
+  handleCitySelection(city: string) {
+    this.eventForm.get('city')?.setValue(
+      city
+    );
   }
 
   redirectToHome(){

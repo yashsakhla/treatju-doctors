@@ -116,6 +116,7 @@
                   </div>
                   <div class="card-body bg-white">
                     <p class="text-muted mb-2">{{ data.address }}</p>
+                    <p class="text-muted mb-2">{{btnName == 'Labs' ? 'Lab' : 'Hospital'}} Open Time :- <span>{{ data.shiftOneStartTime }} - {{data.shiftOneEndTime}}</span> <br> <span *ngIf="data?.shiftTwoStartTime">{{ data?.shiftTwoStartTime }} - {{data?.shiftTwoEndTime}}</span></p>
                     
                     <h6 class="fw-bold">Available Services:</h6>
                     <ul class="mb-4">
@@ -127,6 +128,9 @@
                         {{isBtnDisabled(data) ? 'Already Booked' : 'Book' }}
                       </button>
                       <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin || userData.role !== 'Patient'" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
+                    </div>
+                    <div class="bookedText" *ngIf="isBtnDisabled(data)">
+                      <p class="fw-bold text-muted pt-1">You Have Already Booked this {{btnName == 'Labs' ? 'Lab' : 'Hospital'}} for Service - {{booking(data)?.serviceName}} of Date {{booking(data)?.bookingDate | date:'dd-MMMM-YYYY'}}</p>
                     </div>
                   </div>
                 </div>

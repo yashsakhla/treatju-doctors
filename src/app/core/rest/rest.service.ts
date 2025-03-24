@@ -77,6 +77,10 @@ export class RestService {
     return this.http.put(`${api_url}organizer/edit-staff/${eventId}/${staffId}`,staff);
   }
 
+  deleteEvent(eventId:any){
+    return this.http.delete(`${api_url}organizer/delete-event/${eventId}`);
+  }
+
   deleteDoctor(doctorId:any, eventId:any){
     return this.http.delete(`${api_url}organizer/delete-doctor/${eventId}/${doctorId}`);
   }

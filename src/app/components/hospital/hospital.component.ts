@@ -120,8 +120,10 @@ export class HospitalComponent implements OnInit {
       });
 
       this.hospitalForm = this.fb.group({
-        startTime: ['', Validators.required],
-        endTime: ['', [Validators.required]]
+        shiftOneStartTime: ['', Validators.required],
+        shiftOneEndTime: ['', [Validators.required]],
+        shiftTwoStartTime: [''],
+        shiftTwoEndTime: [''],
       });
 
       this.staffForm = this.fb.group({
@@ -273,8 +275,10 @@ export class HospitalComponent implements OnInit {
 
     patchhospitalvalue(hospital:any){
       this.hospitalForm = this.fb.group({
-        startTime: [hospital.startTime, Validators.required],
-        endTime: [hospital.endTime, [Validators.required]]
+        shiftOneStartTime: [hospital.shiftOneStartTime, Validators.required],
+        shiftOneEndTime: [hospital.shiftOneEndTime, [Validators.required]],
+        shiftTwoStartTime: [hospital.shiftTwoStartTime],
+        shiftTwoEndTime: [hospital.shiftTwoEndTime],
       });
     }
   
