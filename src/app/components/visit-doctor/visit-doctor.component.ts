@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 import { TosterService } from '../../core/toster/toster.service';
 import { LoaderComponent } from '../loader/loader.component';
 import { CityDropdownComponent } from '../city-dropdown/city-dropdown.component';
+import { PdfService } from '../../core/pdf/pdf.service';
 
 interface Staff {
   name: string;
@@ -90,7 +91,7 @@ export class VisitDoctorComponent {
   isEditstaff: any;
   isFirstLoad: boolean = true;
   
-    constructor(private rest: RestService, private fb: FormBuilder, private auth :AuthService, private router:Router, private toster:TosterService) {
+    constructor(private rest: RestService, private fb: FormBuilder, private auth :AuthService, private router:Router, private toster:TosterService, private pdf:PdfService) {
       this.visitDoctorForm = this.fb.group({
         visitName:['Dummy Visit'],
         visitPlace: ['', Validators.required],
@@ -184,6 +185,10 @@ export class VisitDoctorComponent {
         }
         return item;
       });
+    }
+
+    print(patient:any){
+      this.pdf.print(patient);
     }
 
     

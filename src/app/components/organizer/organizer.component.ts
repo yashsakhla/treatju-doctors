@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 import { TosterService } from '../../core/toster/toster.service';
 import { LoaderComponent } from '../loader/loader.component';
 import { CityDropdownComponent } from '../city-dropdown/city-dropdown.component';
+import { PdfService } from '../../core/pdf/pdf.service';
 
 interface Event {
   _id:string,
@@ -113,7 +114,7 @@ export class OrganizerComponent implements OnInit, OnDestroy {
 
   
 
-  constructor(private rest: RestService, private fb: FormBuilder, private auth:AuthService, private router:Router, private toster:TosterService) {
+  constructor(private rest: RestService, private fb: FormBuilder, private auth:AuthService, private router:Router, private toster:TosterService, private pdf:PdfService) {
     this.eventForm = this.fb.group({
       eventName: ['', Validators.required],
       eventPlace: ['', Validators.required],
@@ -585,5 +586,9 @@ export class OrganizerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
    
+  }
+
+  print(patient:any){
+    this.pdf.print(patient);
   }
 }

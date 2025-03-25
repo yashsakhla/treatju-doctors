@@ -105,6 +105,8 @@ export class RegisterComponent {
       password: this.password,
       role:this.selectedRole,
       gender:this.selectedGender,
+      city: this.city,
+      address: this.address,
     } : {
       username: this.userName,
       email:this.email,

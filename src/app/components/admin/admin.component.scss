@@ -1,9 +1,35 @@
 /* Sidebar Styling */
+.header{
+    background-color: #facc15;
+    padding: 0.8rem 1rem;
+    .right, .left{
+        p{
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+    }
+}
 .admin{
     position: relative;
     padding-left: 0;
     padding-top: 2px;
 }
+
+.avatar{
+    background-color: #9d9d9d39;
+    border-radius: 50%;
+    padding: 0.5rem 0.8rem;
+}
+
+.details{
+    .name{
+        font-size: 1rem;
+    }
+    .no{
+        font-size: 0.7rem;
+    }
+}
+
 .side-nav {
     width: 0;
     background: #fff;
@@ -14,12 +40,19 @@
     left: 0;
     transition: width 0.3s ease-in-out;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    height: 100vh;
 }
 
 /* When sidebar is open */
 .side-nav.open {
     width: 250px;
     padding: 1rem;
+}
+
+.disabled{
+    opacity: 50%;
+    pointer-events: none;
+    cursor: not-allowed;
 }
 
 /* Sidebar links */
@@ -42,10 +75,21 @@
     z-index: 1000;
 }
 
+.btn-row{
+    display:  flex;
+    background-color: #f1f5f9;
+    border-radius: 10px;
+    button{
+      width: 23%;
+      min-width: fit-content;
+      color: #64748b;
+    }
+  }
+
 /* Main Content */
 .side-content {
-    padding: 20px;
     width: 100%;
+    background-color: #f9fafb;
 }
 
 .table-container {
@@ -76,7 +120,7 @@ h2 {
 }
 
 .active{
-    background-color: #00000038;
+    background-color: #9d9d9d39;
     border-radius: 10px;
 }
 
@@ -106,5 +150,41 @@ h6{
   
   .row {
     justify-content: center; /* Centers the cards */
+  }
+
+  .activeBtn{
+    background-color: #fff;
+    color: #000;
+  }
+
+  .scroll-table{
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .header-main{
+        flex-direction: column;
+    }
+
+    .card{
+        padding: 0;
+    }
+
+    .open{
+        position: absolute;
+        padding-left: 3rem !important;
+        z-index: 1;
+        height: 100%;
+    }
+
+    .btn-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        button{
+            width: 100%;
+        }
+      }
   }
   

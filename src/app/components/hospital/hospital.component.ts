@@ -14,6 +14,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { TosterService } from '../../core/toster/toster.service';
 import { LoaderComponent } from '../loader/loader.component';
+import { PdfService } from '../../core/pdf/pdf.service';
 
 interface Staff {
   name: string;
@@ -104,7 +105,7 @@ export class HospitalComponent implements OnInit {
   showService: any;
   isFirstLoad: boolean = true;
   
-    constructor(private rest: RestService, private fb: FormBuilder, private auth :AuthService, private router:Router, private toster:TosterService) {
+    constructor(private rest: RestService, private fb: FormBuilder, private auth :AuthService, private router:Router, private toster:TosterService, private pdf:PdfService) {
       this.visithospitalForm = this.fb.group({
         name: ['', Validators.required],
         fee: ['', [Validators.required]]
@@ -137,7 +138,6 @@ export class HospitalComponent implements OnInit {
     ngOnInit(): void {
       this.loggedIn = this.auth.getAuth();
       this.userData = this.rest.userData;
-      console.log(this.userData)
       this.hospital = this.userData;
       if(this.userData.role == 'Hospital'){
         this.show = 'dashboard'
@@ -151,6 +151,10 @@ export class HospitalComponent implements OnInit {
         this.show = this.showStaff.name;
         this.getAllPatientDetails(this.showStaff._id);
       }
+    }
+
+    print(patient:any){
+      this.pdf.print(patient);
     }
 
     getDetails(){

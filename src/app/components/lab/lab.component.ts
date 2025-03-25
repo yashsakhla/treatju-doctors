@@ -14,6 +14,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { TosterService } from '../../core/toster/toster.service';
 import { LoaderComponent } from '../loader/loader.component';
+import { PdfService } from '../../core/pdf/pdf.service';
 
 interface Staff {
   name: string;
@@ -93,7 +94,7 @@ export class LabComponent implements OnInit {
   showService: any;
   isFirstLoad: boolean = true;
   
-    constructor(private rest: RestService, private fb: FormBuilder, private auth :AuthService, private router:Router, private toster:TosterService) {
+    constructor(private rest: RestService, private fb: FormBuilder, private auth :AuthService, private router:Router, private toster:TosterService, private pdf:PdfService) {
       this.visitlabForm = this.fb.group({
         name: ['', Validators.required],
         fee: ['', [Validators.required]]
@@ -257,6 +258,10 @@ export class LabComponent implements OnInit {
         shiftTwoStartTime: [lab.shiftTwoStartTime],
         shiftTwoEndTime: [lab.shiftTwoEndTime],
       });
+    }
+
+    print(patient:any){
+      this.pdf.print(patient);
     }
   
     toggleSidebar() {

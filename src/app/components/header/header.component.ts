@@ -11,14 +11,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RestService } from '../../core/rest/rest.service';
 import bootstrap from 'bootstrap';
 import { AuthService } from '../../core/auth/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Popover } from 'bootstrap';
 import { CityDropdownComponent } from '../city-dropdown/city-dropdown.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule, CityDropdownComponent],
+  imports: [CommonModule, FormsModule, CityDropdownComponent, RouterModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })

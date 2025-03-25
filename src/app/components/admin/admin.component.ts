@@ -6,10 +6,15 @@ import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { EventFormComponentComponent } from '../event-form-component/event-form-component.component';
+import { Router } from '@angular/router';
+import { LoaderComponent } from '../loader/loader.component';
+import { AuthService } from '../../core/auth/auth.service';
+import { CityDropdownComponent } from '../city-dropdown/city-dropdown.component';
 
 interface Event {
   eventName: string;
@@ -36,7 +41,7 @@ interface Staff {
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, EventFormComponentComponent],
+  imports: [CommonModule, ReactiveFormsModule, EventFormComponentComponent, LoaderComponent, CityDropdownComponent, FormsModule],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
 })
@@ -44,78 +49,136 @@ export class AdminComponent implements OnInit {
   isSidebarOpen = true;
   selectedCity: any;
   show: string = 'dashboard';
-
-  eventForm!: FormGroup;
-  doctorForm!: FormGroup;
-  staffForm!: FormGroup;
-
-  events!: Event;
-  doctors: Doctor[] = [];
-  staff: Staff[] = [];
-
+  loader:boolean = false;
   showDoctorForm = false;
   showStaffForm = false;
   existData:any;
+  loggedIn:boolean = false;
+
+  buttons:any[]=[
+    {
+      name:"Organizer Camp",
+      active:true,
+      notification:0,
+      key:"organizers"
+    },
+    {
+      name:"Visit Doctor",
+      active:false,
+      notification:0,
+      key:"visitDoctors"
+    },
+    {
+      name:"Labs",
+      active:false,
+      notification:0,
+      key:"labs"
+    },
+    {
+      name:"Hospital",
+      active:false,
+      notification:0,
+      key:"hospitals"
+    },
+  ];
+
+  activeButton: string='organizers';
 
   dashboardData = [
-    { title: 'Total Doctors', value: 1 },
-    { title: 'Total Staff', value: 0 },
-    { title: 'Total Bookings', value: 0 },
-    { title: 'Pending Bookings', value: 0 },
-    { title: 'Completed Bookings', value: 0 },
-    { title: 'Cancelled Bookings', value: 0 }
+    { title: 'Total Organizer Event', value: 1 },
+    { title: 'Total Visit Doctor', value: 0 },
+    { title: 'Total Labs', value: 0 },
+    { title: 'Total Hospital', value: 0 },
+    { title: 'Your Revenue', value: 0 },
+    { title: 'Balance Revenue', value: 0 },
   ];
-
-  patients = [
-    { name: 'Rahul Sharma', gender: 'M', email: 'rahul@example.com', mobile: '9876543210', status: 'Pending' },
-    { name: 'Priya Verma', gender: 'F', email: 'priya@example.com', mobile: '9123456789', status: 'Pending' },
-    { name: 'Amit Kumar', gender: 'M', email: 'amit@example.com', mobile: '9012345678', status: 'Complete' }
-  ];
+  userData: any;
 
   
+  constructor(private router:Router, private auth:AuthService, private rest:RestService){
 
-  constructor(private rest: RestService, private fb: FormBuilder) {
-    this.eventForm = this.fb.group({
-      eventName: ['', Validators.required],
-      eventPlace: ['', Validators.required],
-      eventDate: ['', Validators.required],
-      startTime: ['', Validators.required],
-      endTime: ['', Validators.required],
-    });
-
-    this.doctorForm = this.fb.group({
-      name: ['', Validators.required],
-      address: ['', Validators.required],
-      mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      pass: ['', Validators.required],
-    });
-
-    this.staffForm = this.fb.group({
-      name: ['', Validators.required],
-      address: ['', Validators.required],
-      mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      pass: ['', Validators.required],
-    });
   }
-
   ngOnInit(): void {
-    this.existData=this.rest.userData?.data;
-    this.events = this.rest.userData?.data.eventDetails[0];
-    if(this.events){
-      this.patchValue(this.events);
-      this.doctors = this.existData.doctors ? this.existData.doctors : [];
-      this.staff = this.existData.staff ? this.existData.staff : [];
-    }
+    this.loggedIn = this.auth.getAuth();
+    this.userData = this.rest.userData;
+    this.getData();
   }
 
-  patchValue(events:any){
-    this.eventForm = this.fb.group({
-      eventName: [events.eventName, Validators.required],
-      eventPlace: [events.eventPlace, Validators.required],
-      eventDate: [events.eventDate, Validators.required],
-      startTime: [events.startTime, Validators.required],
-      endTime: [events.endTime, Validators.required],
-    });
+  searchQuery: string = '';
+  currentPage: number = 1;
+  pageSize: number = 5;
+  totalItems = 20;
+
+  organizers:any[] = [];
+
+  get filteredOrganizers() {
+    return this.organizers
+      .filter(org => org.name.toLowerCase().includes(this.searchQuery.toLowerCase()))
+      .slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.pageSize);
+  }
+  get pageNumbers(): number[] {
+    return Array.from({ length: Math.ceil(this.organizers.length / this.pageSize) }, (_, i) => i + 1);
+  }
+  deleteOrganizer(index: number) {
+    const globalIndex = (this.currentPage - 1) * this.pageSize + index;
+    this.organizers.splice(globalIndex, 1);
+  }
+
+  markAsPaid(index: number) {
+    const globalIndex = (this.currentPage - 1) * this.pageSize + index;
+    this.organizers[globalIndex].pendingRevenue = 0;
+  }
+
+  changePage(page: number) {
+    this.currentPage = page;
+  }
+
+  getData(){
+    this.rest.getAdminDashboard().subscribe(
+      {
+        next:(res:any)=>{
+          this.dashboardData = this.dashboardData.map((item) => {
+            if (item.title === 'Total Organizer Event') {
+               return { ...item, value: res.totalEvents }; // Assuming patients represent bookings
+             } else if(item.title === 'Total Visit Doctor'){
+               return { ...item, value: res.totalVisitDoctors };
+             }else if(item.title === 'Total Labs'){
+               return { ...item, value: res.totalLabs};
+             }else if(item.title === 'Total Hospital'){
+               return { ...item, value: res.totalHospitals };
+             }
+             else if(item.title === 'Your Revenue'){
+               return { ...item, value: res.totalRevenue };
+             }
+             else if(item.title === 'Balance Revenue'){
+               return { ...item, value: res.totalPendingRevenue };
+             }
+             return item;
+           });
+        },
+        error:()=>{
+
+        }
+      }
+    )
+  }
+
+  handleCitySelection(event:any){
+    this.rest.getAdminDataByCity(event).subscribe(
+      {
+        next:(res:any)=>{
+          this.existData = res;
+          this.organizers = this.existData[this.activeButton];
+        },
+        error:()=>{
+
+        }
+      }
+    )
   }
 
   toggleSidebar() {
@@ -126,74 +189,24 @@ export class AdminComponent implements OnInit {
     this.show = path;
   }
 
-  addEvent() {
-    if (this.eventForm.valid) {
-      const data =  {
-        data: {
-          ...this.existData,
-          eventDetails: [this.eventForm.value]
-        }
-      };
-      this.rest.addEvent(data).subscribe((res: any) => {
-        this.existData = res.data;
-        this.events = this.existData.eventDetails[0];
-        this.patchValue(this.events);
-      });
-      this.showDoctorForm = true;
-    }
+  redirectToHome(){
+    this.router.navigate(['user']);
   }
 
-  addDoctor() {
-    console.log(this.doctorForm);
-    if (this.doctorForm.valid) {
-      this.doctors.push(this.doctorForm.value);
-      const data ={
-        data: {
-          ...this.existData,
-          doctors: this.doctors // Append new doctor
-        }
-      };
-      // this.rest.addEventDoctor(data).subscribe((res:any)=>{
-      //   this.existData = res.data;
-      //   this.doctors = res.data.doctors;
-      //   this.showStaffForm = true;
-      //   this.doctorForm.reset();
-      // })
-    }
+  redirect(path:string){
+    this.router.navigate([path]);
   }
 
-  addStaff() {
-    if (this.staffForm.valid) {
-      this.staff.push(this.staffForm.value);
-      const data = {
-        data: {
-          ...this.existData,
-          staff: this.staff // Append new doctor
-        }
-      };
-      // this.rest.addEventStaff(data).subscribe((res:any)=>{
-      //   this.existData = res.data;
-      //   this.staff = this.existData.staff;
-      //   this.staffForm.reset();
-      // })
-    }
+  toggleActiveButton(selectedKey: string) {
+    this.searchQuery = '';
+    this.activeButton = selectedKey;
+    this.organizers = this.existData[selectedKey];
+    this.buttons.forEach(button => {
+      button.active = button.key === selectedKey;
+    });
   }
 
-  deleteDoctor(index: number) {
-    this.doctors.splice(index, 1);
-  }
+  refresh(){
 
-  deleteStaff(index: number) {
-    this.staff.splice(index, 1);
-  }
-
-  // Toggle Status (Pending <-> Complete)
-  toggleStatus(index: number) {
-    this.patients[index].status = this.patients[index].status === 'Pending' ? 'Complete' : 'Pending';
-  }
-
-  // Remove Patient from List
-  removePatient(index: number) {
-    this.patients.splice(index, 1);
   }
 }

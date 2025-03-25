@@ -239,4 +239,12 @@ export class RestService {
    patientStatus(patient:any,isFor:any,payload:any){
     return this.http.put(`${api_url+isFor}/${patient.bookEvents[0].serviceId}/patient/${patient._id}`,payload);
    }
+
+   getAdminDashboard(){
+    return this.http.get(`${api_url}admin/dashboard`);
+   }
+
+   getAdminDataByCity(city:string){
+    return this.http.get(`${api_url}admin/get-details/${city}`);
+   }
 }
