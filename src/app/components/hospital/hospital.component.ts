@@ -597,7 +597,7 @@ export class HospitalComponent implements OnInit {
     }
     
   redirect(path:string){
-    if(path == 'login'){
+    if(path ==  'login/user'){
       this.auth.removeAuth();
     }
     this.router.navigate([path]);

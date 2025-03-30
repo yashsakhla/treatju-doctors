@@ -15,28 +15,7 @@ import { Router } from '@angular/router';
 import { LoaderComponent } from '../loader/loader.component';
 import { AuthService } from '../../core/auth/auth.service';
 import { CityDropdownComponent } from '../city-dropdown/city-dropdown.component';
-
-interface Event {
-  eventName: string;
-  eventPlace: string;
-  eventDate: string;
-  startTime: string;
-  endTime: string;
-}
-
-interface Doctor {
-  name: string;
-  address: string;
-  mobile: string;
-  pass: string;
-}
-
-interface Staff {
-  name: string;
-  address: string;
-  mobile: string;
-  pass: string;
-}
+import { TosterService } from '../../core/toster/toster.service';
 
 @Component({
   selector: 'app-admin',
@@ -49,136 +28,165 @@ export class AdminComponent implements OnInit {
   isSidebarOpen = true;
   selectedCity: any;
   show: string = 'dashboard';
-  loader:boolean = false;
+  loader: boolean = false;
   showDoctorForm = false;
   showStaffForm = false;
-  existData:any;
-  loggedIn:boolean = false;
+  existData: any;
+  loggedIn: boolean = false;
 
-  buttons:any[]=[
-    {
-      name:"Organizer Camp",
-      active:true,
-      notification:0,
-      key:"organizers"
-    },
-    {
-      name:"Visit Doctor",
-      active:false,
-      notification:0,
-      key:"visitDoctors"
-    },
-    {
-      name:"Labs",
-      active:false,
-      notification:0,
-      key:"labs"
-    },
-    {
-      name:"Hospital",
-      active:false,
-      notification:0,
-      key:"hospitals"
-    },
+  buttons: any[] = [
+    { name: "Organizer Camp", active: true, notification: 0, key: "organizers" },
+    { name: "Visit Doctor", active: false, notification: 0, key: "visitDoctors" },
+    { name: "Labs", active: false, notification: 0, key: "labs" },
+    { name: "Hospital", active: false, notification: 0, key: "hospitals" },
   ];
-
-  activeButton: string='organizers';
-
-  dashboardData = [
-    { title: 'Total Organizer Event', value: 1 },
-    { title: 'Total Visit Doctor', value: 0 },
-    { title: 'Total Labs', value: 0 },
-    { title: 'Total Hospital', value: 0 },
-    { title: 'Your Revenue', value: 0 },
-    { title: 'Balance Revenue', value: 0 },
-  ];
-  userData: any;
 
   
-  constructor(private router:Router, private auth:AuthService, private rest:RestService){
+  buttonsPending: any[] = [
+    { name: "Labs", active: true, notification: 0, key: "labs" },
+    { name: "Hospital", active: false, notification: 0, key: "hospitals" },
+  ];
 
-  }
-  ngOnInit(): void {
-    this.loggedIn = this.auth.getAuth();
-    this.userData = this.rest.userData;
-    this.getData();
-  }
-
+  activeButton: string = 'organizers';
+  dashboardData: any = {};
+  userData: any;
   searchQuery: string = '';
   currentPage: number = 1;
   pageSize: number = 5;
   totalItems = 20;
+  organizers: any[] = [];
+  lab: any;
+  hospital: any;
+  activePendingButton:string = 'labs';
 
-  organizers:any[] = [];
+  constructor(private router: Router, private auth: AuthService, private rest: RestService, private toster: TosterService) { }
+
+  ngOnInit(): void {
+    this.loggedIn = this.auth.getAuth();
+    this.userData = this.rest.userData;
+    this.getData();
+    this.getPending();
+  }
 
   get filteredOrganizers() {
     return this.organizers
-      .filter(org => org.name.toLowerCase().includes(this.searchQuery.toLowerCase()))
-      .slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+    .filter(org => org.name.toLowerCase().includes(this.searchQuery.toLowerCase()))
+    .slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
   }
+
+  get filteredPending() {
+    if(this.activePendingButton == 'labs'){
+      return this.lab
+    .filter((org:any) => org.username.toLowerCase().includes(this.searchQuery.toLowerCase()))
+    .slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+    }else{
+      return this.hospital
+    .filter((org:any) => org.username.toLowerCase().includes(this.searchQuery.toLowerCase()))
+    .slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+    }
+  }
+  
 
   get totalPages(): number {
     return Math.ceil(this.totalItems / this.pageSize);
   }
+
   get pageNumbers(): number[] {
     return Array.from({ length: Math.ceil(this.organizers.length / this.pageSize) }, (_, i) => i + 1);
   }
-  deleteOrganizer(index: number) {
-    const globalIndex = (this.currentPage - 1) * this.pageSize + index;
-    this.organizers.splice(globalIndex, 1);
+
+  deleteOrganizer(id:any) {
+    this.loader = true;
+    this.rest.deleteProfile(id,this.activeButton).subscribe(
+      {
+        next:()=>{
+          this.loader = false;
+          this.getData();
+          this.toster.showSuccess('Deleted successfully!');
+        },
+        error:()=>[
+          this.toster.showError('Failed to mark payment as completed.')
+        ]
+      }
+    )
   }
 
-  markAsPaid(index: number) {
-    const globalIndex = (this.currentPage - 1) * this.pageSize + index;
-    this.organizers[globalIndex].pendingRevenue = 0;
+  markAsPaid(id: any) {
+    const payload = {
+      feeBalance: 0,
+      paidStatus: 'completed',
+      serviceStop: false
+    };
+
+    this.loader = true;
+    this.rest.updatePaidStatus(id, payload, this.activeButton).subscribe({
+      next: () => {
+        this.loader = false;
+        this.toster.showSuccess('Payment marked as completed successfully!');
+        this.refresh();
+      },
+      error: (error) => {
+        this.loader = false;
+        this.toster.showError('Failed to mark payment as completed.');
+        console.error(error);
+      }
+    });
   }
 
   changePage(page: number) {
     this.currentPage = page;
   }
 
-  getData(){
-    this.rest.getAdminDashboard().subscribe(
+  getPending(){
+    this.rest.getPending().subscribe(
       {
         next:(res:any)=>{
-          this.dashboardData = this.dashboardData.map((item) => {
-            if (item.title === 'Total Organizer Event') {
-               return { ...item, value: res.totalEvents }; // Assuming patients represent bookings
-             } else if(item.title === 'Total Visit Doctor'){
-               return { ...item, value: res.totalVisitDoctors };
-             }else if(item.title === 'Total Labs'){
-               return { ...item, value: res.totalLabs};
-             }else if(item.title === 'Total Hospital'){
-               return { ...item, value: res.totalHospitals };
-             }
-             else if(item.title === 'Your Revenue'){
-               return { ...item, value: res.totalRevenue };
-             }
-             else if(item.title === 'Balance Revenue'){
-               return { ...item, value: res.totalPendingRevenue };
-             }
-             return item;
-           });
-        },
-        error:()=>{
-
+          this.lab = res.lab;
+          this.hospital = res.hospital
         }
       }
     )
   }
 
-  handleCitySelection(event:any){
-    this.rest.getAdminDataByCity(event).subscribe(
-      {
-        next:(res:any)=>{
-          this.existData = res;
-          this.organizers = this.existData[this.activeButton];
-        },
-        error:()=>{
-
-        }
+  getData() {
+    this.loader = true;
+    this.rest.getAdminDashboard().subscribe({
+      next: (res: any) => {
+        this.dashboardData = res;
+        this.loader = false;
+        this.toster.showSuccess('Dashboard data fetched successfully!');
+      },
+      error: (error) => {
+        this.loader = false;
+        this.toster.showError('Failed to fetch dashboard data.');
+        console.error(error);
       }
-    )
+    });
+  }
+
+  handleCitySelection(event: any) {
+    this.loader = true;
+    this.rest.getAdminDataByCity(event).subscribe({
+      next: (res: any) => {
+        this.existData = res;
+        this.organizers = this.existData[this.activeButton];
+        this.loader = false;
+        this.toster.showSuccess('City data fetched successfully!');
+      },
+      error: (error) => {
+        this.loader = false;
+        this.toster.showError('Failed to fetch city data.');
+        console.error(error);
+      }
+    });
+  }
+
+  toggle(btn:string){
+    if(btn == 'labs'){
+      this.activePendingButton = btn
+    }else{
+      this.activePendingButton = btn
+    }
   }
 
   toggleSidebar() {
@@ -187,26 +195,31 @@ export class AdminComponent implements OnInit {
 
   showContent(path: string) {
     this.show = path;
+    if(path == 'pending'){
+      this.toggle('labs');
+    }
   }
 
-  redirectToHome(){
+  redirectToHome() {
     this.router.navigate(['user']);
   }
 
-  redirect(path:string){
+  redirect(path: string) {
     this.router.navigate([path]);
+  }
+
+  objectKeys(obj: any): string[] {
+    return Object.keys(obj);
   }
 
   toggleActiveButton(selectedKey: string) {
     this.searchQuery = '';
     this.activeButton = selectedKey;
     this.organizers = this.existData[selectedKey];
-    this.buttons.forEach(button => {
-      button.active = button.key === selectedKey;
-    });
+    this.buttons.forEach(button => button.active = button.key === selectedKey);
   }
 
-  refresh(){
-
+  refresh() {
+    this.getData();
   }
 }

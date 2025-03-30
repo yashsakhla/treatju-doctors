@@ -17,7 +17,7 @@ export const routes: Routes = [
         pathMatch:"full"
     },
     {
-        path:"login",
+        path:"login/:role",
         component:LoginComponent,
     },
     {

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, of, retry } from 'rxjs';
+import { BehaviorSubject, forkJoin, map, of, retry } from 'rxjs';
 import { api_url } from '../../../enviorment';
 import { TosterService } from '../toster/toster.service';
 
@@ -49,8 +49,12 @@ export class RestService {
    return this.http.post(api_url+'auth/signup',data);
   }
 
-  login(data:any){
-    return this.http.post(`${api_url}auth/login`,data);
+  login(role:string,data:any){
+    if(role == 'admin'){
+      return this.http.post(`${api_url}auth/admin-login`,data);
+    }else{
+      return this.http.post(`${api_url}auth/login`,data);
+    }
   }
 
   addEvent(eventDetails:any){
@@ -246,5 +250,52 @@ export class RestService {
 
    getAdminDataByCity(city:string){
     return this.http.get(`${api_url}admin/get-details/${city}`);
+   }
+
+   updatePaidStatus(id:string, payload:any, role:string){
+    let apiEndpoint = '';
+
+    switch (role) {
+      case 'visitDoctors':
+        apiEndpoint = `${api_url}admin/update-visit-doctor-fee/${id}`;
+        break;
+      case 'labs':
+        apiEndpoint = `${api_url}admin/update-lab-fee/${id}`;
+        break;
+      case 'hospitals':
+        apiEndpoint = `${api_url}admin/update-hospital-fee/${id}`;
+        break;
+    }
+
+    return this.http.patch(apiEndpoint, payload);
+   }
+
+   deleteProfile(id:string, role:any){
+    let apiEndpoint = '';
+
+    switch (role) {
+      case 'visitDoctors':
+        apiEndpoint = `${api_url}admin/delete-visit-doctor/${id}`;
+        break;
+      case 'labs':
+        apiEndpoint = `${api_url}admin/delete-lab/${id}`;
+        break;
+      case 'hospitals':
+        apiEndpoint = `${api_url}admin/delete-hospital/${id}`;
+        break;
+    }
+
+    return this.http.delete(apiEndpoint);
+   }
+
+   getPending(){
+    const api1 = this.http.get(api_url + 'admin/get-pending-labs');
+    const api2 = this.http.get(api_url + 'admin/get-pending-hospitals');
+    return forkJoin([api1, api2]).pipe(
+      map(([lab, hospital]) => ({
+        lab,
+        hospital
+      }))
+    );
    }
 }

@@ -9,10 +9,10 @@
       </div>
       <div class="details d-flex flex-column">
         <div class="name">
-           Admin - {{userData.username}}
+           Admin
         </div>
         <div class="no">
-          {{userData.mobile}}
+          You Logged In as ADMIN
         </div>
       </div>
     </div>
@@ -32,6 +32,13 @@
       >
         <a class="nav-link"><i class="bi bi-calendar-event"></i>Data</a>
       </li>
+      <li
+        class="nav-item"
+        [class.active]="show === 'pending'"
+        (click)="showContent('pending')"
+      >
+        <a class="nav-link"><i class="bi bi-calendar-event"></i>Pending Lab/Hospital</a>
+      </li>
     </ul>
   </div>
 
@@ -47,7 +54,7 @@
         <div class="left d-flex">
           <p
             class="d-flex justify-content-center align-items-center mb-0 p-2"
-            (click)="redirect('login')"
+            (click)="redirect( 'login/user')"
           >
             <i class="bi bi-box-arrow-in-right fa-lg mb-0 px-1"></i
             >{{ loggedIn ? "Logout" : "Login" }}
@@ -67,21 +74,20 @@
         <h4 class="fw-bold">Dashboard</h4>
   
         <div class="row mt-3">
-          <div class="col-md-3 mb-4" *ngFor="let card of dashboardData">
-            <div class="card custom-card">
-              <div class="card-body text-center">
-                <h5 class="fw-semibold">{{ card.title }}</h5>
-                <h2 class="fw-bold">{{ card.value }}</h2>
-                <ng-container *ngIf="card.title == 'Balance Revenue'">
-                  <div class="d-flex flex-column justify-content-start align-items-start">
-                    <li>From Labs :- 0</li>
-                    <li>From Hospitals :- 0</li>
-                    <li>From Visit Doctors :- 0</li>
-                  </div>
-                </ng-container>
+          <div class="row">
+            <div class="col-md-6 mb-4" *ngFor="let key of objectKeys(dashboardData)">
+              <div class="card custom-card">
+                <div class="card-body">
+                  <h4 class="fw-bold text-center">{{ key }}</h4>
+                  <ul class="list-group">
+                    <li class="list-group-item" *ngFor="let dataKey of objectKeys(dashboardData[key])">
+                      <strong>{{ dataKey }}:</strong> {{ dashboardData[key][dataKey] }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
+          </div>          
         </div>
       </div>
       <div class="seeting container mt-4" *ngIf="show == 'data'">
@@ -141,17 +147,120 @@
                     <td>{{ org.adminRevenue }}</td>
                     <td>{{ org.feeBalance }}</td>
                     <td>
-                      <button class="btn btn-danger btn-sm me-2" (click)="deleteOrganizer(i)">Delete</button>
+                      <button class="btn btn-danger btn-sm me-2" (click)="deleteOrganizer(org._id)">Delete</button>
                       <button 
                         class="btn btn-success btn-sm" 
                         [disabled]="org.pendingRevenue === 0"
-                        (click)="markAsPaid(i)">
+                        (click)="markAsPaid(org._id)">
                         Paid
                       </button>
                     </td>
                   </tr>
                 </tbody>
                 <tbody *ngIf="filteredOrganizers.length < 1">
+                  <tr>
+                    <td colspan="8" class="text-center">
+                      No Data Found
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          
+            <!-- Pagination -->
+            <nav>
+              <ul class="pagination justify-content-center">
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                  <button class="page-link" (click)="changePage(currentPage - 1)">Previous</button>
+                </li>
+                <li class="page-item" *ngFor="let page of pageNumbers">
+                  <button class="page-link" [class.active]="currentPage === page" (click)="changePage(page)">{{ page }}</button>
+                </li>
+                <li class="page-item" [class.disabled]="currentPage === pageNumbers.length">
+                  <button class="page-link" (click)="changePage(currentPage + 1)">Next</button>
+                </li>                
+              </ul>
+            </nav>
+          </div>
+        </div>
+  
+        <!-- Doctor Form -->
+        <div class="card mt-3 p-3" *ngIf="activeButton == 'visitDoctors'">
+          
+        </div>
+  
+        <!-- Staff Form -->
+        <div class="card mt-3 p-3" *ngIf="activeButton == 'labs'">
+
+          
+        </div>
+        <div class="card mt-3 p-3" *ngIf="activeButton == 'hospitals'">
+
+          
+        </div>
+      </div>
+      <div class="seeting container mt-4" *ngIf="show == 'pending'">
+
+        <div class="btn-row gap-1 justify-content-between align-items-center px-1 py-1 mt-2">
+          <button 
+            type="button" 
+            class="btn position-relative"
+            [class.activeBtn]="btn.key === activePendingButton"
+            *ngFor="let btn of buttonsPending" 
+            (click)="toggle(btn.key)">
+            {{ btn.name }}
+          </button>
+        </div>
+
+  
+        <!-- Event Form -->
+        <div class="card mt-3 p-3">
+          <div class="container mt-4">        
+            <!-- Search Input -->
+            <div class="mb-3">
+              <input type="text" class="form-control" placeholder="Search by name..." [(ngModel)]="searchQuery">
+            </div>
+          
+            <!-- Table -->
+            <div class="table-responsive">
+              <table class="table table-striped table-bordered text-center">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Name</th>
+                    <th *ngIf="activeButton == 'organizers'">Mobile</th>
+                    <th *ngIf="activeButton == 'visitDoctors'">City</th>
+                    <th *ngIf="activeButton == 'labs' || activeButton == 'hospitals'">Work Id</th>
+                    <th *ngIf="activeButton == 'organizers' || activeButton == 'hospitals'">Total Services</th>
+                    <th>Total Staff</th>
+                    <th>Email</th>
+                    <th>Admin Revenue</th>
+                    <th>Pending Revenue</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="!(filteredPending.length < 1)">
+                  <tr *ngFor="let org of filteredPending; let i = index">
+                    <td>{{ org.username }}</td>
+                    <td *ngIf="activeButton == 'organizers'">{{ org.mobile }}</td>
+                    <td *ngIf="activeButton == 'visitDoctors'">{{ org.city }}</td>
+                    <td *ngIf="activeButton == 'labs' || activeButton == 'hospitals'">{{ org.workId }}</td>
+                    <td *ngIf="activeButton == 'organizers' || activeButton == 'hospitals'">{{ org.availableServices.length }}</td>
+                    <td>{{ org.staff.length }}</td>
+                    <td>{{ org.email }}</td>
+                    <td>{{ org.adminRevenue }}</td>
+                    <td>{{ org.feeBalance }}</td>
+                    <td>
+                      <button class="btn btn-danger btn-sm me-2" (click)="deleteOrganizer(org._id)">Delete</button>
+                      <button 
+                        class="btn btn-success btn-sm" 
+                        [disabled]="org.pendingRevenue === 0"
+                        (click)="markAsPaid(org._id)">
+                        Paid
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody *ngIf="filteredPending.length < 1">
                   <tr>
                     <td colspan="8" class="text-center">
                       No Data Found

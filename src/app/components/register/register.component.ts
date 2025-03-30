@@ -122,7 +122,7 @@ export class RegisterComponent {
       next:(res:any)=>{
         this.loader = false;
         this.toster.showSuccess("You have registered Successfully, Pleae Login now!","Registeration Done")
-        this.router.navigate(['login']);
+        this.router.navigate([ 'login/user']);
       },
       error:(err:any)=>{
         this.loader = false;
@@ -136,6 +136,6 @@ export class RegisterComponent {
   }
 
   redirect() {
-    this.router.navigate(['/login']);
+    this.router.navigate(['login/user']);
   }
 }

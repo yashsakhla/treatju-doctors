@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { RestService } from '../../core/rest/rest.service';
 import { LoaderComponent } from '../loader/loader.component';
@@ -22,23 +22,39 @@ export class LoginComponent {
   mobile!:string;
   pass!:string;
   showLoading!:boolean;
+  role: any;
+  validRoles = ['user','admin']
+  showModal: any;
   
-  constructor(private router:Router, private auth:AuthService, private rest:RestService, private toaster:TosterService){
-
-  }
+  constructor(private router:Router, private auth:AuthService, private rest:RestService, private toaster:TosterService, private route:ActivatedRoute){
+    this.route.paramMap.subscribe(params => {
+      this.role = params.get('role');
+      if (!this.validRoles.includes(this.role)) {
+        this.router.navigate(['login/user']); // Redirect to seller login if invalid
+      }
+    });
+  } 
 
   login(){
     this.showLoading = true;
-    const data = {
+    const data = this.role == 'admin' ? {
+      email: this.mobile,
+      password:this.pass
+    } : {
       mobile: Number(this.mobile),
       password:this.pass
     }
 
-    this.rest.login(data).subscribe({
+    this.rest.login(this.role,data).subscribe({
       next:(res:any)=>{
         this.showLoading = false;
         this.auth.isUserLoggedIn = true;
+        if(res.userDetails){
         this.rest.userData = res.userDetails;
+        if(res.userDetails.serviceStoped || (res.userDetails.role == 'VisitDoctor' && res.userDetails.feeBalance == 0)){
+          this.showModal = true;
+          return;
+        }
         const name = res.userDetails.username ? res.userDetails.username : res.userDetails.name;
         this.toaster.showSuccess("You have successfully LoggedIn!","Hey,"+name);
         this.auth.setAuth(res.access_token, res.userDetails);
@@ -70,8 +86,14 @@ export class LoginComponent {
             break;
       
           default:
-            this.router.navigate(['/login']); // Default redirection if role is unknown
+            this.router.navigate(['login']); // Default redirection if role is unknown
             break;
+        }
+        }else if(res.admin){
+          this.rest.userData = res.admin;
+        this.toaster.showSuccess("You have successfully LoggedIn!","Hey, ADMIN");
+        this.auth.setAuth(res.access_token, res.admin);
+        this.router.navigate(['admin'])
         }
       },
       error:(error:any)=>{
@@ -84,5 +106,9 @@ export class LoginComponent {
 
   redirect(){
     this.router.navigate(['/register']);
+  }
+
+  closeModal() {
+    this.showModal = false;
   }
 }

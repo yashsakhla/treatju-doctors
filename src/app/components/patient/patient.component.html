@@ -53,7 +53,7 @@
                           (click)="bookCamp(data, doc)" *ngIf="isUserLoggedin">
                           <i class="bi bi-calendar-check"></i> {{isBtnDisabled(doc) ? 'Already Booked' : 'Book' }}
                         </button>
-                        <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin || userData.role !== 'Patient'" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
+                        <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin || userData.role !== 'Patient'" (click)="redirect( 'login/user')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
                       </td>
                     </tr>
                   </tbody>
@@ -98,7 +98,7 @@
                           (click)="bookVisit(data, visit)" *ngIf="isUserLoggedin">
                           <i class="bi bi-calendar-check"></i> {{isBtnDisabled(data) ? 'Already Booked' : 'Book' }}
                         </button>
-                        <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin || userData.role !== 'Patient'" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
+                        <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin || userData.role !== 'Patient'" (click)="redirect( 'login/user')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
                       </td>
                     </tr>
                   </tbody>
@@ -127,7 +127,7 @@
                       <button type="button" class="btn btn-dark" [disabled]="isBtnDisabled(data)" (click)="openModal(data)" *ngIf="isUserLoggedin">
                         {{isBtnDisabled(data) ? 'Already Booked' : 'Book' }}
                       </button>
-                      <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin || userData.role !== 'Patient'" (click)="redirect('login')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
+                      <button class="btn btn-dark btn-sm px-3 py-2" *ngIf="!isUserLoggedin || userData.role !== 'Patient'" (click)="redirect( 'login/user')"><i class="bi bi-person-check px-1"></i>Login to Book</button>
                     </div>
                     <div class="bookedText" *ngIf="isBtnDisabled(data)">
                       <p class="fw-bold text-muted pt-1">You Have Already Booked this {{btnName == 'Labs' ? 'Lab' : 'Hospital'}} for Service - {{booking(data)?.serviceName}} of Date {{booking(data)?.bookingDate | date:'dd-MMMM-YYYY'}}</p>
