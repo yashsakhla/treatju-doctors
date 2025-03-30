@@ -10,8 +10,9 @@
             </div>
             <form>
               <div class="form-group pt-3">
-                <label for="mobile">Mobile Number (User ID)</label>
-                <input type="tel" class="form-control" name="mobile" id="mobile" [(ngModel)]="mobile" placeholder="Enter your mobile number" required>
+                <label for="mobile" *ngIf="role == 'user'">Mobile Number (User ID)</label>
+                <label for="mobile" *ngIf="role == 'admin'">Email</label>
+                <input type="text" class="form-control" name="mobile" id="mobile" [(ngModel)]="mobile" placeholder="Enter your mobile number" required>
               </div>
               <div class="form-group pt-3">
                 <label for="pass">Password (6 numbers)</label>

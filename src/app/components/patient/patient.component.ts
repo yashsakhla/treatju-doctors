@@ -69,7 +69,7 @@ export class PatientComponent implements OnInit, OnDestroy {
   userData!:UserData;
   city!:string;
   loader!:boolean;
-  isUserLoggedin!:boolean;
+  isUserLoggedin:boolean = false;
   selectedDate!:string;
   selectedService:any;
 
@@ -246,7 +246,7 @@ export class PatientComponent implements OnInit, OnDestroy {
   }
 
   isBtnDisabled(data:any){
-    return this.userData.bookEvents.find((item:any) => item.providerId == data._id);
+    return this.userData ? this.userData.bookEvents.find((item:any) => item.providerId == data._id) : false ;
   }
 
   booking(data:any){
