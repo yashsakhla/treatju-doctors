@@ -222,4 +222,9 @@ export class AdminComponent implements OnInit {
   refresh() {
     this.getData();
   }
+
+  logout(){
+    this.auth.removeAuth();
+    this.router.navigate(['user'])
+  }
 }

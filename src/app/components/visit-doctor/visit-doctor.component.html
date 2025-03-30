@@ -110,6 +110,7 @@
                 <button
                   class="btn btn-primary"
                   *ngIf="card.title == 'Admin Revenue (20%)'"
+                  (click)="redirectToPhonePe()"
                 >
                   Pay Now
                 </button>
@@ -117,6 +118,11 @@
             </div>
           </div>
         </div>
+
+        <div class="qr-code-box">
+          <img src="assets/images/phonepe-qr.jpg" alt="QR Code" class="qr-image"/>
+        </div>
+        
       </div>
       <div class="seeting container mt-4" *ngIf="show == 'setting'">
         <h4 class="fw-bold">Settings</h4>

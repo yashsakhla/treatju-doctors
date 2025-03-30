@@ -41,7 +41,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.role = this.rest.userData.role;
+    this.role = this.rest.userData ? this.rest.userData.role : null;
     this.loggedIn = this.auth.getAuth();
     setInterval(() => {
       this.nextSlide();
@@ -79,7 +79,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
       this.popoverInstance = new Popover(popoverTrigger, { trigger: 'manual' });
 
       this.renderer.listen(popoverTrigger, 'click', (event) => {
-        event.stopPropagation(); // Prevents immediate closing
+        event.stopPropagation();
         this.togglePopover();
       });
 
@@ -93,6 +93,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
   }
 
   logout(){
+    console.log('called')
     this.auth.removeAuth();
     window.location.reload();
   }

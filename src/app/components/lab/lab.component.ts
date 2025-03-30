@@ -497,4 +497,9 @@ export class LabComponent implements OnInit {
     }
     this.router.navigate([path]);
   }
+
+  redirectToPhonePe() {
+    const upiUrl = `phonepe://pay?pa=Q787720513@ybl&pn=${this.userData.name}&mc=0000&tn=Payment for service&am=${this.userData.feeBalance}&cu=INR`;
+    window.location.href = upiUrl;
+  }
 }

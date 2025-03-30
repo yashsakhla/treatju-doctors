@@ -53,6 +53,11 @@ export const routes: Routes = [
         component:InfoComponent
     },
     {
+        path:'login',
+        redirectTo:'login/user',
+        pathMatch:'full'
+    },
+    {
         path:'**',
         component:PatientComponent
     }

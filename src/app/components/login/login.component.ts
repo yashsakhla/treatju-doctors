@@ -51,7 +51,7 @@ export class LoginComponent {
         this.auth.isUserLoggedIn = true;
         if(res.userDetails){
         this.rest.userData = res.userDetails;
-        if(res.userDetails.serviceStoped || (res.userDetails.role == 'VisitDoctor' && res.userDetails.feeBalance == 0)){
+        if(res.userDetails.serviceStoped){
           this.showModal = true;
           return;
         }

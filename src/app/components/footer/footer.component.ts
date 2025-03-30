@@ -3,6 +3,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { retry } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { RestService } from '../../core/rest/rest.service';
 
 @Component({
   selector: 'app-footer',
@@ -12,8 +13,9 @@ import { CommonModule } from '@angular/common';
   styleUrl: './footer.component.scss'
 })
 export class FooterComponent implements OnInit {
-  constructor(private auth:AuthService, private router:Router){}
+  constructor(private auth:AuthService, private router:Router, private rest:RestService){}
   isUserLoggedIn!:boolean;
+  email:string = 'tritju@gmail.com'
   ngOnInit(): void {
     this.isUserLoggedIn = this.auth.getAuth()
   }
@@ -24,5 +26,13 @@ export class FooterComponent implements OnInit {
       return;
     }
     this.router.navigate([path]);
+  }
+
+  adminTo(){
+    if(this.rest.userData.role === 'Admin'){
+      this.router.navigate(['admin']);
+    }else{
+      this.router.navigate(['login/admin'])
+    }
   }
 }

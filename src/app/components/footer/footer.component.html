@@ -6,7 +6,7 @@
         <div class="col-md-3">
           <h5>Quick Links</h5>
           <ul class="list-unstyled">
-            <li><a [routerLink]="['/admin']" class="text-dark text-decoration-none">Admin</a></li>
+            <li><a (click)="adminTo()" class="text-dark text-decoration-none">Admin</a></li>
             <li><a [routerLink]="['/info','aboutUs']" class="text-dark text-decoration-none">About Us</a></li>
           </ul>
         </div>
@@ -20,19 +20,20 @@
           </ul>
         </div>
   
-        <!-- Address -->
-        <div class="col-md-3">
-          <h5>Address</h5>
-          <p>123, Main Street, City, Country</p>
-        </div>
-  
         <!-- Contact Us -->
         <div class="col-md-3">
           <h5>Contact Us</h5>
           <div class="d-flex gap-3">
-            <a href="#" class="text-dark fs-4"><i class="bi bi-whatsapp"></i></a>
-            <a href="#" class="text-dark fs-4"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="text-dark fs-4"><i class="bi bi-telegram"></i></a>
+            <a [href]="'mailto:' + email" class="text-dark">
+              <i class="bi bi-mail"></i> {{email}}
+            </a>            
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <h5>Connect</h5>
+          <div class="d-flex gap-3">
+            <a href="#" class="text-dark fs-4"><i class="bi bi-whatsapp"></i></a>     
           </div>
         </div>
   

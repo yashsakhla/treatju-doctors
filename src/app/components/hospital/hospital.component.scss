@@ -118,6 +118,23 @@ h6{
     padding-top: 10px;
 }
 
+.qr-code-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #000;
+    padding: 20px;
+    border-radius: 12px;
+    background-color: #fff;
+    width: fit-content;
+    margin: 20px auto;
+  }
+  
+  .qr-image {
+    width: 200px; /* Adjust size as needed */
+    height: 200px;
+  }
+
 .custom-card {
     background: #ffffff; /* White Background */
     border: 1px solid #e0e0e0; /* Light Border */
