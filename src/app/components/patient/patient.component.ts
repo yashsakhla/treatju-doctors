@@ -95,9 +95,8 @@ export class PatientComponent implements OnInit, OnDestroy {
     };
   }
 
-  getIsoString(date:any){
-    const istOffset = 6.5 * 60 * 60 * 1000;
-    return new Date(date).getTime() + istOffset;
+  getIsoString(date:Date){
+    return date.getTime();
   }
 
   @ViewChild('myModal') modalElement!: ElementRef;

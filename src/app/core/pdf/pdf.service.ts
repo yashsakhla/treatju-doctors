@@ -9,38 +9,45 @@ import html2canvas from "html2canvas";
 export class PdfService {
 
   constructor() { }
-
   print(data: any) {
     const doc = new jsPDF();
-    console.log("caleed")
-    // Tritju Junction Header
-    const title = "Tritju Junction";
-
-    // Set Header Text
-    doc.setFontSize(20);
-    doc.text(title, 80, 20); // Center-aligned
-
-    // Patient Details
+  
+    // Header Section
+    const headerTitle = "Sharma Hospital";
+    doc.setFontSize(22);
+    doc.setFont("times", "bold");
+    doc.text(headerTitle, 10, 20);
+  
+    // Header Lines
+    doc.setDrawColor(0, 0, 0); // Black color
+    doc.line(10, 25, 200, 25); // Horizontal line below the header
+  
+    // Content Styling
     doc.setFontSize(12);
-    let yPosition = 40;
-    doc.text(`Patient ID: ${data._id}`, 10, yPosition);
-    doc.text(`Name: ${data.username}`, 10, (yPosition += 10));
-    doc.text(`Mobile: ${data.mobile}`, 10, (yPosition += 10));
-    doc.text(`Email: ${data.email}`, 10, (yPosition += 10));
-    doc.text(`Age: ${data.age}`, 10, (yPosition += 10));
-    doc.text(`Gender: ${data.gender}`, 10, (yPosition += 10));
-    doc.text(`Role: ${data.role}`, 10, (yPosition += 10));
-
-    // Booking Details
-    yPosition += 10;
-    doc.text("Booked Events:", 10, yPosition);
-    data.bookEvents.forEach((event: any, index: number) => {
-      yPosition += 10;
-      doc.text(`${index + 1}. ${event.serviceName} - ${new Date(event.bookingDate).toDateString()}`, 10, yPosition);
-    });
-
+    doc.setFont("times", "normal");
+  
+    // Left Column
+    let yPosition = 35;
+    doc.text(`Patient ID - ${data._id}`, 10, yPosition);
+    doc.text(`Name - ${data.username}`, 10, (yPosition += 10));
+    doc.text(`Mobile - ${data.mobile}`, 10, (yPosition += 10));
+    doc.text(`Age - ${data.age}`, 10, (yPosition += 10));
+    doc.text(`Gender - ${data.gender}`, 10, (yPosition += 10));
+  
+    // Right Column
+    yPosition = 35;
+    const rightColumnX = 120;
+    doc.text(`Date - ${new Date().toLocaleDateString()}`, rightColumnX, yPosition);
+    doc.text(`Booked By -`, rightColumnX, (yPosition += 10));
+    doc.text(`Tritju.com`, rightColumnX, (yPosition += 10));
+  
+    // Prescription Section (Below Content)
+    yPosition += 20;
+    doc.text(`Rx`, 10, yPosition);
+  
     // Automatically Trigger PDF Download
     doc.save("Patient_Receipt.pdf");
   }
+  
 
 }

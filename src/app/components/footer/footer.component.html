@@ -1,45 +1,52 @@
 <footer class="footer py-4 bg-warning text-dark">
-    <div class="container">
-      <div class="row">
-        
-        <!-- Quick Links -->
-        <div class="col-md-3">
-          <h5>Quick Links</h5>
-          <ul class="list-unstyled">
-            <li><a (click)="adminTo()" class="text-dark text-decoration-none">Admin</a></li>
-            <li><a [routerLink]="['/info','aboutUs']" class="text-dark text-decoration-none">About Us</a></li>
-          </ul>
-        </div>
-  
-        <!-- Policy -->
-        <div class="col-md-3">
-          <h5>Policy</h5>
-          <ul class="list-unstyled">
-            <li><a [routerLink]="['/info','privacy']" class="text-dark text-decoration-none">Privacy Policy</a></li>
-            <li><a [routerLink]="['/info','tnc']" class="text-dark text-decoration-none">Terms of Service</a></li>
-          </ul>
-        </div>
-  
-        <!-- Contact Us -->
-        <div class="col-md-3">
-          <h5>Contact Us</h5>
-          <div class="d-flex gap-3">
-            <a [href]="'mailto:' + email" class="text-dark">
-              <i class="bi bi-mail"></i> {{email}}
-            </a>            
-          </div>
-        </div>
+  <div class="container">
+    <div class="row">
+      
+      <!-- Quick Links -->
+      <div class="col-md-3">
+        <h5>Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a (click)="adminTo()" class="text-dark text-decoration-none">Admin</a></li>
+          <li><a [routerLink]="['/info','aboutUs']" class="text-dark text-decoration-none">About Us</a></li>
+        </ul>
+      </div>
 
-        <div class="col-md-3">
-          <h5>Connect</h5>
-          <div class="d-flex gap-3">
-            <a [href]="'https://wa.me/9772415844'" class="text-dark fs-4">
-              <i class="bi bi-whatsapp"></i>
-            </a>             
-          </div>
+      <!-- Policy -->
+      <div class="col-md-3">
+        <h5>Policy</h5>
+        <ul class="list-unstyled">
+          <li><a [routerLink]="['/info','privacy']" class="text-dark text-decoration-none">Privacy Policy</a></li>
+          <li><a [routerLink]="['/info','tnc']" class="text-dark text-decoration-none">Terms of Service</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Us -->
+      <div class="col-md-3">
+        <h5>Contact Us</h5>
+        <div class="d-flex gap-3">
+          <a [href]="'mailto:' + email" class="text-dark">
+            <i class="bi bi-mail"></i> {{email}}
+          </a>            
         </div>
-  
+      </div>
+
+      <!-- Connect -->
+      <div class="col-md-3">
+        <h5>Connect</h5>
+        <div class="d-flex gap-3">
+          <a [href]="'https://wa.me/9772415844'" class="text-dark fs-4">
+            <i class="bi bi-whatsapp"></i>
+          </a>             
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Copyright Line -->
+    <div class="row mt-4">
+      <div class="col text-center">
+        <p class="m-0">&copy; 2025 Tritju. All rights reserved.</p>
       </div>
     </div>
-  </footer>
-  
+  </div>
+</footer>

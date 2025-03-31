@@ -35,7 +35,7 @@
                       <td class="text-sm py-3 px-2">
 
                         <div class="fw-600">{{ data.eventDate | date:'dd-MM-yy' }}</div>
-                        <div class="small text-muted">{{ getIsoString(data.startTime) | date:'HH:mm a' }} to {{ getIsoString(data.endTime) | date:'HH:mm a' }}</div>
+                        <div class="small text-muted">{{ data.startTime | date:'HH:mm' }} to {{data.endTime | date:'HH:mm' }}</div>
                       </td>
               
                       <!-- Doctors Column -->
@@ -80,7 +80,7 @@
                       <!-- Date & Time Column -->
                       <td class="text-sm py-3 px-2">
                         <div class="fw-600">{{ visit.eventDate | date:'dd-MM-yy' }}</div>
-                        <div class="small text-muted">{{ getIsoString(visit.startTime) | date:'h a' }} to {{ getIsoString(visit.endTime) | date:'h a' }}</div>
+                        <div class="small text-muted">{{ visit.startTime | date:'HH:mm a' }} to {{visit.endTime | date:'HH:mm a' }}</div>
                       </td>
               
                       <!-- Doctors Column -->
