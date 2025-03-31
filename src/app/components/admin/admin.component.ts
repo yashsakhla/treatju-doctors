@@ -86,7 +86,7 @@ export class AdminComponent implements OnInit {
     .filter((org:any) => org.username.toLowerCase().includes(this.searchQuery.toLowerCase()))
     .slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
     }else{
-      return this.hospital
+      return this.visitDoctor
       .filter((org:any) => org.username.toLowerCase().includes(this.searchQuery.toLowerCase()))
       .slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
     }

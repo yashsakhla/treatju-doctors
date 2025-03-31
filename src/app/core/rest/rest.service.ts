@@ -267,7 +267,7 @@ export class RestService {
         break;
     }
 
-    return this.http.put(apiEndpoint, payload);
+    return this.http.patch(apiEndpoint, payload);
    }
 
    deleteProfile(id:string, role:any){

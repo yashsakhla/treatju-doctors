@@ -227,11 +227,11 @@
                 <thead class="table-dark">
                   <tr>
                     <th>Name</th>
-                    <th *ngIf="activeButton == 'organizers'">Mobile</th>
-                    <th *ngIf="activeButton == 'visitDoctors'">City</th>
-                    <th *ngIf="activeButton == 'labs' || activeButton == 'hospitals'">Work Id</th>
-                    <th *ngIf="activeButton == 'organizers' || activeButton == 'hospitals'">Total Services</th>
-                    <th>Total Staff</th>
+                    <th>Mobile</th>
+                    <th>City</th>
+                    <th>Work Id</th>
+                    <th *ngIf="activePendingButton != 'visitDoctors'">Total Services</th>
+                    <th *ngIf="activePendingButton != 'visitDoctors'">Total Staff</th>
                     <th>Email</th>
                     <th>Admin Revenue</th>
                     <th>Pending Revenue</th>
@@ -241,15 +241,15 @@
                 <tbody *ngIf="!(filteredPending.length < 1)">
                   <tr *ngFor="let org of filteredPending; let i = index">
                     <td>{{ org.username }}</td>
-                    <td *ngIf="activeButton == 'organizers'">{{ org.mobile }}</td>
-                    <td *ngIf="activeButton == 'visitDoctors'">{{ org.city }}</td>
-                    <td *ngIf="activeButton == 'labs' || activeButton == 'hospitals'">{{ org.workId }}</td>
-                    <td *ngIf="activeButton == 'organizers' || activeButton == 'hospitals'">{{ org.availableServices.length }}</td>
-                    <td>{{ org.staff.length }}</td>
+                    <td>{{ org.mobile }}</td>
+                    <td>{{ org.city }}</td>
+                    <td>{{ org.workId }}</td>
+                    <td *ngIf="activePendingButton != 'visitDoctors'">{{ org.availableServices.length }}</td>
+                    <td *ngIf="activePendingButton != 'visitDoctors'">{{ org.staff.length }}</td>
                     <td>{{ org.email }}</td>
                     <td>{{ org.adminRevenue }}</td>
                     <td>{{ org.feeBalance }}</td>
-                    <td>
+                    <td class="d-flex justify-content-center align-items-center p-2">
                       <button class="btn btn-danger btn-sm me-2" (click)="deleteOrganizer(org._id)">Delete</button>
                       <button 
                         class="btn btn-success btn-sm" 
@@ -262,7 +262,7 @@
                 </tbody>
                 <tbody *ngIf="filteredPending.length < 1">
                   <tr>
-                    <td colspan="8" class="text-center">
+                    <td colspan="10" class="text-center">
                       No Data Found
                     </td>
                   </tr>
