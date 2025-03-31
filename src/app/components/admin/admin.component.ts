@@ -43,6 +43,7 @@ export class AdminComponent implements OnInit {
 
   
   buttonsPending: any[] = [
+    { name: "Visit Doctor", active: false, notification: 0, key: "visitDoctors" },
     { name: "Labs", active: true, notification: 0, key: "labs" },
     { name: "Hospital", active: false, notification: 0, key: "hospitals" },
   ];
@@ -57,6 +58,7 @@ export class AdminComponent implements OnInit {
   organizers: any[] = [];
   lab: any;
   hospital: any;
+  visitDoctor:any;
   activePendingButton:string = 'labs';
 
   constructor(private router: Router, private auth: AuthService, private rest: RestService, private toster: TosterService) { }
@@ -79,10 +81,14 @@ export class AdminComponent implements OnInit {
       return this.lab
     .filter((org:any) => org.username.toLowerCase().includes(this.searchQuery.toLowerCase()))
     .slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
-    }else{
+    }else if(this.activePendingButton == 'hospitals'){
       return this.hospital
     .filter((org:any) => org.username.toLowerCase().includes(this.searchQuery.toLowerCase()))
     .slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+    }else{
+      return this.hospital
+      .filter((org:any) => org.username.toLowerCase().includes(this.searchQuery.toLowerCase()))
+      .slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
     }
   }
   
@@ -118,8 +124,11 @@ export class AdminComponent implements OnInit {
       serviceStop: false
     };
 
+    const role = this.show == 'pending' ? this.activePendingButton : this.activeButton;
+    
+
     this.loader = true;
-    this.rest.updatePaidStatus(id, payload, this.activeButton).subscribe({
+    this.rest.updatePaidStatus(id, payload, role).subscribe({
       next: () => {
         this.loader = false;
         this.toster.showSuccess('Payment marked as completed successfully!');
@@ -142,7 +151,8 @@ export class AdminComponent implements OnInit {
       {
         next:(res:any)=>{
           this.lab = res.lab;
-          this.hospital = res.hospital
+          this.hospital = res.hospital,
+          this.visitDoctor = res.visitDoctor
         }
       }
     )

@@ -29,7 +29,7 @@ export class FooterComponent implements OnInit {
   }
 
   adminTo(){
-    if(this.rest.userData.role === 'Admin'){
+    if(this.rest.userData?.role === 'Admin'){
       this.router.navigate(['admin']);
     }else{
       this.router.navigate(['login/admin'])

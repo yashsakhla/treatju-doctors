@@ -267,7 +267,7 @@ export class RestService {
         break;
     }
 
-    return this.http.patch(apiEndpoint, payload);
+    return this.http.put(apiEndpoint, payload);
    }
 
    deleteProfile(id:string, role:any){
@@ -291,10 +291,13 @@ export class RestService {
    getPending(){
     const api1 = this.http.get(api_url + 'admin/get-pending-labs');
     const api2 = this.http.get(api_url + 'admin/get-pending-hospitals');
-    return forkJoin([api1, api2]).pipe(
-      map(([lab, hospital]) => ({
+    const api3 = this.http.get(api_url + 'admin/get-pending-visit-doctors');
+    
+    return forkJoin([api1, api2, api3]).pipe(
+      map(([lab, hospital, visitDoctor]) => ({
         lab,
-        hospital
+        hospital,
+        visitDoctor
       }))
     );
    }
