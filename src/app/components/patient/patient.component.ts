@@ -95,8 +95,9 @@ export class PatientComponent implements OnInit, OnDestroy {
     };
   }
 
-  getIsoString(date:Date){
-    return date.getTime();
+  getIsoString(date:any){
+    console.log(date, new Date(date));
+    return new Date(date);
   }
 
   @ViewChild('myModal') modalElement!: ElementRef;
