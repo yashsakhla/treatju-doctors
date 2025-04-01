@@ -1,1 +1,1 @@
-export const api_url = "https://free-health-camp.onrender.com/"
+export const api_url = "https://api.tritju.com/"

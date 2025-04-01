@@ -19,8 +19,6 @@ export class RestService {
   userData:any = localStorage.getItem('userData') ? this.returnParse() : null;
   selectedCity!:string;
 
-  apiUrl = 'http://localhost:3000/users'; 
-
   eventObject:any;
 
   returnParse(){
