@@ -589,6 +589,6 @@ export class OrganizerComponent implements OnInit, OnDestroy {
   }
 
   print(patient:any){
-    this.pdf.print(patient);
+    this.pdf.print(this.userData,patient);
   }
 }

@@ -154,7 +154,7 @@ export class HospitalComponent implements OnInit {
     }
 
     print(patient:any){
-      this.pdf.print(patient);
+      this.pdf.print(this.hospital,patient);
     }
 
     getDetails(){

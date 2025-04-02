@@ -76,7 +76,7 @@ export class LabComponent implements OnInit {
       { title: 'Cancelled Bookings', value: 0 },
       { title: 'Fee Collection', value: `₹${0}` },
       { 
-        title: 'Admin Revenue (20%)', 
+        title: 'Admin Revenue (50/- patient)', 
         value: `₹${(0).toFixed(2)}` 
       }
     ];
@@ -216,7 +216,7 @@ export class LabComponent implements OnInit {
         }
         else if(item.title === 'Cancel Bookings'){
           return { ...item, value: this.patients.filter(p => p.bookEvents[0].status === 'Cancel').length };
-        }else if(item.title === 'Admin Revenue (20%)'){
+        }else if(item.title === 'Admin Revenue (50/- patient)'){
           return { ...item, value: '₹'+ (this.updateRevenue() * 0.2).toFixed(2) };
         }
         return item;
@@ -261,7 +261,7 @@ export class LabComponent implements OnInit {
     }
 
     print(patient:any){
-      this.pdf.print(patient);
+      this.pdf.print(this.lab,patient);
     }
   
     toggleSidebar() {

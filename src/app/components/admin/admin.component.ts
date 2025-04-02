@@ -191,6 +191,14 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  isObject(value: any): boolean {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
+  isArray(value: any): boolean {
+    return Array.isArray(value);
+  }
+
   toggle(btn:string){
     if(btn == 'labs'){
       this.activePendingButton = btn

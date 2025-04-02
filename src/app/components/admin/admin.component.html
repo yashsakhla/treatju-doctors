@@ -81,12 +81,31 @@
                   <h4 class="fw-bold text-center">{{ key }}</h4>
                   <ul class="list-group">
                     <li class="list-group-item" *ngFor="let dataKey of objectKeys(dashboardData[key])">
-                      <strong>{{ dataKey }}:</strong> {{ dashboardData[key][dataKey] }}
+                      <strong>{{ dataKey }}:</strong>
+                      
+                      <!-- Check if the value is an array (like weeklyData) -->
+                      <ng-container *ngIf="isArray(dashboardData[key][dataKey]); else normalData">
+                        <div *ngFor="let item of dashboardData[key][dataKey]; let i = index" class="mt-2 p-2 border rounded">
+                          <ul class="list-group mt-2">
+                            <li class="list-group-item">
+                              <strong>Admin Revenue:</strong> {{ item['adminRevenue'] }}
+                            </li>
+                            <li class="list-group-item">
+                              <strong>Pending Revenue:</strong> {{ item['pendingRevenue'] }}
+                            </li>
+                          </ul>
+                        </div> 
+                      </ng-container>                      
+                      <!-- Display normal data -->
+                      <ng-template #normalData>
+                        <span>{{ dashboardData[key][dataKey] }}</span>
+                      </ng-template>
                     </li>
                   </ul>
                 </div>
               </div>
             </div>
+                     
           </div>          
         </div>
       </div>

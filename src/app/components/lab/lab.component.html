@@ -115,7 +115,7 @@
                 <h2 class="fw-bold">{{ card.value }}</h2>
                 <button
                   class="btn btn-primary"
-                  *ngIf="card.title == 'Admin Revenue (20%)'"
+                  *ngIf="card.title == 'Admin Revenue (50/- patient)'"
                   (click)="redirectToPhonePe()"
                 >
                   Pay Now
@@ -507,6 +507,11 @@
                 >
                   <i class="bi bi-trash"></i> {{patient.bookEvents[0].status == 'Cancel' ? 'Cancelled' : 'Cancel'}}
                 </button>
+                <button
+                class="btn btn-success btn-sm mx-1" (click)="print(patient)"
+              >
+              <i class="bi bi-printer mb-0" ></i> Print
+              </button>
               </td>
             </tr>
           </tbody>

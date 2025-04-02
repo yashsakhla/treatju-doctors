@@ -194,7 +194,7 @@ export class VisitDoctorComponent {
     }
 
     print(patient:any){
-      this.pdf.print(patient);
+      this.pdf.print(this.visitDoctor,patient);
     }
 
     
