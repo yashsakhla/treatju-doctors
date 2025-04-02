@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostListener, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { city } from '../../city';
 
 @Component({
   selector: 'app-city-dropdown',
@@ -11,23 +12,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class CityDropdownComponent {
 selectedCity = '';
-cities: string[] = [
-    "Mumbai", "Delhi", "Bangalore", "Kolkata", "Chennai", 
-    "Hyderabad", "Ahmedabad", "Pune", "Jaipur", "Surat",
-    "Lucknow", "Kanpur", "Nagpur", "Visakhapatnam", "Indore",
-    "Thane", "Bhopal", "Coimbatore", "Patna", "Vadodara",
-    "Ghaziabad", "Ludhiana", "Agra", "Nashik", "Faridabad",
-    "Meerut", "Rajkot", "Kalyan-Dombivli", "Vasai-Virar",
-    "Varanasi", "Srinagar", "Aurangabad", "Dhanbad", "Amritsar",
-    "Navi Mumbai", "Allahabad", "Ranchi", "Howrah", "Jodhpur",
-    "Mysore", "Gwalior", "Bhubaneswar", "Salem", "Warangal",
-    "Mangalore", "Tiruchirappalli", "Raipur", "Jabalpur", "Kota",
-    "Bikaner", "Udaipur", "Dehradun", "Siliguri", "Durgapur",
-    "Kochi", "Nashik", "Rourkela", "Jamshedpur", "Kurnool",
-    "Tirupati", "Kozhikode", "Gurgaon", "Noida", "Puducherry",
-    "Agartala", "Imphal", "Shillong", "Aizawl", "Itanagar",
-    "Gangtok", "Dimapur", "Kohima", "Dispur"
-];
+cities: string[] = city;
   @Output() citySelected = new EventEmitter<string>(); // Emit selected city
  searchTerm: string = '';// Store the selected city internally
  isDropdownVisible = false;
